@@ -7,7 +7,22 @@ Selenium Hybrid Automation Framework
 5. Framework Creation Steps 
 	5.1 Create Maven project and add dependencies
 	5.2 Understand the Application and Test cases to be automated
-
+	5.3 Page Object Design Pattern: Design or Create Page Object Class
+	5.4 Create an Utilities class which contains all utilities methods used by all Page object classes
+	5.5 Create Test class and Test methods
+	5.6 Create Base Test which contains all Utilities methods used by all Test classes
+	5.7 Implement Test Strategy for test case creation 
+	5.8 Run Tests on Desired browser/Cross browser/Parallel testing/Selective Test cases
+	5.9 Reading Common values from properties file
+	5.10 Data driven Testing and Parameterization
+	5.11 Adding Screenshot method to get Screenshot when any Test fails
+	5.12 Extent Report
+	5.13 Rerun failed Test cases
+	5.14 Execution using pom.xml file
+	5.15 CI and CD 
+	5.16 Adding Logs
+6. Interview Questions on Framework
+7. Framework architecture
 
 REPO: https://github.com/CLNandeesh/Selenium-Hybrid-Framework-RS-Ecommerce-App-Sept-2024
 *********************************************************************************************************************************************************
@@ -1550,5 +1565,288 @@ admin
 
 ->Create new maven project and specify GitHub Url and provide goal as test
 or path of pom.xml file
+
+*********************************************************************************************************************************************************
+16 Adding Logs
+--------------
+->Log Levels
+All<Trace<Debug<Info<Warn<Error<Fatal<Off
+
+->Appenders- Where to generate logs [Console/File] 
+->Loggers - What type of logs to generate[All<Trace<Debug<Info<Warn<Error<Fatal<Off]
+Above two should be updated in log4j2.xml file
+
+Steps:
+->Add dependency
+->Add log4j2.xml configuration file into src/main/resources folder ->log4j2.xml
+->Update Base Test class
+->In initializeDriver() load Log4j xml file
+public Logger logger;
+logger = LogManager.getLogger(this.getClass());
+->Now we can use in any test methods
+
+->Add Log statements in required class
+log.info()
+log.debug()
+log.error()
+
+Packages:
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+Note: Loggers>Root level if we make Off then it wont generate any logs
+
+
+//What type of Logs and COnsole or File log setting to be made here
+    <Loggers>
+        <Root level="INFO">    //what type of log level needed
+            <!--<AppenderRef ref="Console"/>-->  //Do we need console logs
+            <AppenderRef ref="File"/>            //Do we need file logs
+        </Root>
+    </Loggers>
+
+//Location configurations
+    <Properties>
+        <Property name="log-path">./logs</Property>
+        <Property name="log-pattern">%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n</Property>
+    </Properties>
+
+Ex:log4j2.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="INFO">
+    <Properties>
+        <Property name="log-path">./logs</Property>
+        <Property name="log-pattern">%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n</Property>
+    </Properties>
+    
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${log-pattern}"/>
+        </Console>
+
+        <RollingFile name="File" fileName="${log-path}/automation.log"
+                     filePattern="${log-path}/automation-%d{MM-dd-yyyy}-%i.log.gz">
+            <PatternLayout pattern="${log-pattern}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="1MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10"/>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <Root level="INFO">
+            <!--<AppenderRef ref="Console"/>-->
+            <AppenderRef ref="File"/>
+        </Root>
+    </Loggers>
+</Configuration>
+
+Ex:
+package com.ibm.ecommerceapplication.testcomponents;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.time.Duration;
+import java.util.Properties;
+
+import org.apache.commons.io.FileUtils;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import com.ibm.ecommerceapplication.pageobjects.LandingPage;
+import com.ibm.ecommerceapplication.pageobjects.NavigationBarPage;
+import com.ibm.ecommerceapplication.pageobjects.OrderFinalPage;
+import com.ibm.ecommerceapplication.pageobjects.PaymentPage;
+import com.ibm.ecommerceapplication.pageobjects.ProductCatalougePage;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+public class BaseTest {
+
+	public WebDriver driver = null;
+	public LandingPage landingPage = null;
+	public ProductCatalougePage productCatalouge = null;
+	public NavigationBarPage navigationBar = null;
+	public PaymentPage paymentPage = null;
+	public OrderFinalPage orderFinalPage = null;
+
+	public Logger logger;
+
+	public WebDriver initializeDriver() throws IOException {
+
+        //Logging
+        logger = LogManager.getLogger(this.getClass());
+        
+		Properties properties = new Properties();
+		FileInputStream fis = new FileInputStream("./\\src\\main\\resources\\config.properties");
+		properties.load(fis);
+		String browser = properties.getProperty("browser");
+
+		switch (browser) {
+		case "chrome":
+			driver = new ChromeDriver();
+			break;
+
+		case "firefox":
+			driver = new FirefoxDriver();
+			break;
+
+		case "edge":
+			driver = new EdgeDriver();
+			break;
+		}
+
+		driver.manage().window().maximize();
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+
+		return driver;
+
+	}
+
+	@BeforeMethod(alwaysRun = true)
+	public void launchApplication() throws IOException {
+		driver = initializeDriver();
+		landingPage = new LandingPage(driver);
+		landingPage.goTo();
+	}
+
+	@AfterMethod(alwaysRun = true)
+	public void tearDown() {
+		driver.quit();
+	}
+
+}
+
+*********************************************************************************************************************************************************
+Interview Questions on Framework
+=================================
+1. Design pattern in framework
+->Page object model design pattern has been used [Page factory pattern to derive locators]
+->For each page in the application, we created new class and store all the required elements using @FindBy and By annotation making those as private
+->Create all the action methods which can be performed on those elements as public
+->There will be constructor which uses Pagefactory.initElements() to initialize all the Web elements at once before use.
+[Page factory pattern to derive locators]
+
+
+2. Utilities methods in framework
+->Created different utility methods and kept in separate package which will be used across the framework.
+Ex:
+Excel reader utility method : Reads the data from excel and provide it to Data Provider class
+Extent reporter : Used to create Extent report
+Screenshot: To take screenshot when any test fails
+Waits methods
+Random generation methods
+Base test
+Data provider 
+
+3. Inheritance in framework
+->Base Test class extended by all Test class
+->Utilities class extended by all Page object classes
+
+4. Data driven in framework
+->Keep data in excel and used Excel utility class to read data from excel
+->Data provider class contains different data provider methods to get data from Excel utility class and send to @Test method as 2D String array
+
+5. Interface in Framework
+->ITestListener interface to configure report
+->IRetryAnalyzer interface to re run failed test cases 
+->Webdriver interface
+
+6. Encapsulation in Framework
+->In POC we have created an elements as private.
+->WebElements should be accessed only through action methods which are public
+
+7. Parallel execution in Framework
+->Test ng.xml we have used parallel="tests"
+->Each test in Testng.xml file contains separate class in which each thread belongs to test will be separate and will not be overridden
+->ThreadLocal class has been used to implement thread safe mechanism to resolve reporting issue.
+
+8. Static keywords in Framework
+->Webdriver is not static since same driver will be shared with all thread if we make Webdriver static
+->Utility methods are created as static so it can be called using class name
+
+9. Global properties in Framework
+->Kept all global values in properties file 
+->In BaseTest, initializeDriver() we have initialized Properties class and used object reference to get value from the properties file.
+->Url, Browser, Timeouts,...
+
+10. Running selective test cases in Framework
+->Used grouping concepts to run selective test cases.
+->In Testng.xml file we use run tag to run specific test methods.
+
+11. Flaky test in Framework
+->IRetryAnalyzer interface to re run failed test cases
+->retryAnalyzer = Retry.class attribute is specified in @Test for all the test methods which may fail.
+
+12. Screenshot on failure in Framework
+->Created screenshot utility method in Basetest
+->In Listener class, on any test fails , onTestFailure will call screenshot utility method to take screenshot and to send path of the screenshot
+->Now that screenshot will be added to the report
+
+*********************************************************************************************************************************************************
+Framework architecture
+======================
+Java: Programming language
+Selenium Web driver : Test automation tool
+POM: Design pattern
+Test NG: Unit testing framework
+Java Properties file: To store global values
+Excel: To store data and use in Test cases
+Apache Log4J: To generate Logs
+Extent report: For reporting
+
+Test NG and POM xml : Selective test case, Parallel testing Test execution.
+
+Git hub: To store code
+Jenkins: CI CD
+
+
+Component 1:
+Page Object class
+->Separate class has been created for each Web page 
+->Contains Elements, Actions and Constructor to initialize all the Elements 
+->Extends Utilities class
+
+Component 2:
+Utilities class for POC
+->Contains all Reusable reference variables and Utility methods used by POC.
+
+Component 3:
+Base Test class 
+->Contains Reusable reference variables, Driver initialization method[BM], Closing driver method [AM], Utility methods used by Test class methods
+
+Component 4:
+Test Class 
+->Contains all related Test methods which extends Base Test class
+->Create Object for POC and invokes action methods present in POC to perform required actions
+->Perform Validations
+->Read data from Excel or any Utility method and send it to POC action methods.
+->Extends Base Test class 
+
+Component 5:
+Listener Class
+->Implements ITestListener interface
+->Used to configure report and do all loggings for report generation
+->To attach Screenshot on any Test fails
+
+Component 6:
+TestNG XML file and POM XML file
+->To specify all required test cases to be executed.
+->Parallel testing, Grouping.
+->To Trigger the execution
+
+
+Component 7:
+Report generation class : Used to generate Extent report
+Excel reader class : Used to read data from excel and send it to Data provider class methods
+Data provider class : Accepts data from Excel reader class and send it to Test method
 
 *********************************************************************************************************************************************************
