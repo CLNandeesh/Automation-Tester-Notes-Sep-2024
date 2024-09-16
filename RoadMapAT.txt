@@ -1,0 +1,20 @@
+Topics
+======
+1) Selenium and Framework
+Source: RS/Udemy
+
+2) API Automation and Framework
+Source: OC/Udemy
+
+3) Load runner 
+Source: Trainer
+
+4) Selenium and API Interview questions
+Source: RS/Udemy
+
+5) Manual testing
+Source: Pavan/Youtube
+
+6) SQL
+Source: 
+

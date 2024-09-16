@@ -1,0 +1,2433 @@
+Selenium Content - SDET
+=======================
+WebDriver
+Invoking Browser
+Locators
+FindElement vs FindElements
+Get methods
+Conditional Methods
+Synchronization Methods
+Navigate Methods
+Checkbox and Radiobuttons
+Alerts or Popup
+Frames
+Switching methods
+Dropdowns
+Webtable
+Datepicker
+Page Object Model
+Test NG
+Extent Reports
+Action Class
+Keyboard Actions using Actions class
+JavaScript executor
+File Upload
+Screenshots
+Browser Options
+Broken Links
+
+*********************************************************************************************************************************************************
+Exceptions
+==========
+->NoSuchElementException
+Cause: Element not present in the page when automation script try to perform operation, Sync issue
+
+->ElementNotFoundException
+Cause: Locator is incorrect
+
+->ElementClickInterceptedException
+Cause: Cannot able to perform specified action on given element
+
+->InvalidSelectorException
+Cause: Wrong locator syntax
+
+->ElementIntercepted Exception
+Cause: Selenium cant able to execute JS code on Webpage
+Cant able to perform operation on Webpage sendKeys() or click() methods
+Solution: Use JS code to perform the action
+
+*********************************************************************************************************************************************************
+Practise Sites:
+https://testautomationpractice.blogspot.com/
+https://www.countries-ofthe-world.com/flags-of-the-world.html
+https://davidwalsh.name/demo/multiple-file-upload.php
+
+*********************************************************************************************************************************************************
+Selenium WebDriver
+==================
+->Interface, API, Component in Selenium suit.
+->Used to automate Web browser actions.
+
+Java->WebDriver<->Browser
+
+WebDriver Hierarchy
+-------------------
+                          SearchContext[I]
+
+                           WebDriver[I]
+          
+                        RemoteWebDriver[C]
+
+       ChromiumDriver[C]                   FirefoxDriver[C] ....
+ChromeDriver[C] EdgeDriver[C]
+
+*********************************************************************************************************************************************************
+Invoking Browser
+================
+->Methods
+WebDriver driver = new ChromeDriver();
+driver.manage().window().maximize();
+driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+driver.get("https://testautomationpractice.blogspot.com/");
+       
+Ex:
+public class BrowserOperation1 {
+    public static void main(String[] args) {
+
+        WebDriver driver = new ChromeDriver();
+        driver.get("https://demo.opencart.com/");
+        String title = driver.getTitle();
+        System.out.println("Title is: " + title);
+        driver.quit();
+
+    }
+}
+
+*********************************************************************************************************************************************************
+Locators
+========
+->Used to identify elements
+->Static method present in By class
+->To get group of Webelements, then we can use className() and tagName()
+
+Basic Locators 
+id()/name()/class()/linkText()/className()/tagName()/partialLinkText()
+
+Customized Locators
+cssSelector()/xpath()
+
+Ex: 
+WebElement element=driver.findElement(By.name("search")).sendKeys("Mobile");
+List<WebElement> elements=driver.findElements(By.className("search")).sendKeys("Mobile");
+
+Ex:
+public class LocatorsDemo1 {
+    public static void main(String[] args) {
+        WebDriver driver = new ChromeDriver();
+        driver.get("https://demo.opencart.com/");
+        driver.manage().window().maximize();
+
+        WebElement ele=driver.findElement(By.name("search"));
+        ele.sendKeys("Mobile");
+
+        List<WebElement> elements=driver.findElements(By.className("nav-item"));
+        elements.forEach(x-> System.out.println(x.getText()));
+
+    }
+}
+
+Ex: To get all images src attribute value
+public class LocatorsDemo1 {
+    public static void main(String[] args) {
+        WebDriver driver = new ChromeDriver();
+        driver.get("https://demo.opencart.com/");
+        driver.manage().window().maximize();
+
+        List<WebElement> images = driver.findElements(By.tagName("img"));
+        images.stream().map(x -> x.getAttribute("src")).forEach(x -> System.out.println(x));
+
+    }
+}
+
+Css Selector
+------------
+Ex: driver.findElement(By.cssSelector(""));
+
+tagName#idName
+tagName.className
+tagName[attName='attValue']
+tagName.className[attName='attValue']
+
+->tagName is optional
+#idName
+
+->Compound class name
+Ex:classnmae1 classname2
+can use any one class name or classname1.classname2
+tagName.classname1
+tagName.classname2
+.classname1
+
+
+XPath
+-----
+Ex: driver.findElement(By.xpath(""));
+
+/ current child hierarchy
+// all child hierarchy
+
+Types
+-----
+->Absolute: 
+Starts with html 
+Starts with/
+Do not use attributes
+Not stable
+
+->Relative: 
+Direct to element
+Starts with //
+Uses attributes
+Stable
+
+//tagName[@attName='attvalue']
+
+//tagName[@attName='attvalue'][@attName='attvalue']
+
+//*[@attName='attvalue']
+
+//tagName[@attName='attvalue' and @attName='attvalue']
+
+//tagName[@attName='attvalue' or @attName='attvalue']
+
+//tagName[text()='anyInnerText']
+
+//tagName[starts-with(@attName,'partialAttValue')]
+
+//tagName[ends-with(@attName,'partialAttValue')]
+
+//tagName[contains(@attName,'partialAttValue')]
+
+//tagName[contains(text(),'partialInnerTextValue')]
+
+Chained Xpath
+-------------
+->No attributes or inner text for an element then need to come from parent
+->Go to parent and come to child
+parent
+ child1
+  child2 
+
+parentXpathwithAttribute/child1tagName/child2TagName
+
+Xpath Axes
+----------
+parent and grand parent
+ancestor::
+
+child, grand child
+descendant::
+//
+
+Immediate brother, same parent other children
+preceding-sibling::
+following-sibling::
+
+brothers, same or different parents other children [same hierarchy] 
+following::
+preceding::
+
+child::
+parent::
+
+
+Syntax:
+xpathOfSelf/parent::parentXpath or tagname
+
+
+Ex 1: Grand Children [descendant]
+form
+  div
+  div
+    input
+    span
+
+Identify span from form
+formXpath/div[2]/span
+formXpath/*/span
+formXpath/descendant::span
+formXpath//span
+
+Ex 2: Grand Children [descendant]
+a1
+a2
+a3
+  a31
+  a32
+  a33
+
+Need to go to a33 from a1
+a1//a33
+
+
+Ex: Ancestor 
+form
+  div
+  div
+    input
+    span
+
+span/ancestor::form //form will be identified
+span/ancestor::*  //div will be identified since its first ancestor
+
+Either one Xpath
+-----------------
+xpath1|xpath2|xpath3
+
+first()/last()
+--------------
+->Used as index
+->To find first or last of all current identified elements
+xpath/following::input[2]
+xpath/following::input[last()]
+xpath/following::input[first()]
+
+*********************************************************************************************************************************************************
+FindElement vs FindElements
+===========================
+WebElement element=driver.findElement(By.name("search")).sendKeys("Mobile");
+List<WebElement> elements=driver.findElements(By.className("search")).sendKeys("Mobile");
+
+If a Locator not matching any of the Webelement
+FindElement: returns NoSuchElement exception
+FindElements: returns 0 elements, empty list will be created
+
+*********************************************************************************************************************************************************
+Get Methods
+===========
+->Methods
+driver.get(url)
+driver.getTitle()
+driver.getCurrentUrl() 
+driver.getPageSource()
+driver.getWindowHandle() 
+driver.getWindowHandles()
+
+->Access through Webdriver instance
+driver.get(url)
+Opens browser URL
+
+driver.getTitle() 
+returns title of the page
+
+driver.getCurrentUrl() 
+returns URL of the page
+
+driver.getPageSource() 
+returns source code of the page
+
+driver.getWindowHandle() 
+returns ID of the  single browser window [String]
+
+driver.getWindowHandles() 
+returns ID's of all multiple browser windows [Set<String>]
+
+Ex: Get Methods
+public class GetMethodsDemo {
+    public static void main(String[] args) {
+        WebDriver driver = new ChromeDriver();
+        driver.get("https://opensource-demo.orangehrmlive.com/web/index.php/auth/login");
+        driver.manage().window().maximize();
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+
+        String title = driver.getTitle();
+        System.out.println("Title is: " + title);
+
+        String currentURL = driver.getCurrentUrl();
+        System.out.println("URL is: " + currentURL);
+
+        String handle = driver.getWindowHandle();
+        System.out.println("Window Handle is: " + handle);
+
+        WebElement linkElement = driver.findElement(By.linkText("OrangeHRM, Inc"));
+        linkElement.click();
+
+        Set<String> handles = driver.getWindowHandles();
+        handles.forEach(h -> System.out.println("Handle value is: " + h));
+
+        driver.quit();
+    }
+}
+
+OUTPUT:
+Title is: OrangeHRM
+URL is: https://opensource-demo.orangehrmlive.com/web/index.php/auth/login
+Window Handle is: F431D21FBD60E8B854525E57234673D0
+Handle value is: F431D21FBD60E8B854525E57234673D0
+Handle value is: 8B3E86149CD1643FB5CBA091103BA335
+
+*********************************************************************************************************************************************************
+Scenario: Switch to different browsers and get their titles using streams
+=========================================================================
+public class WindowHandlesAndSwitchToWIndow {
+    public static void main(String[] args) {
+        WebDriver driver = new ChromeDriver();
+        driver.get("https://opensource-demo.orangehrmlive.com/web/index.php/auth/login");
+        driver.manage().window().maximize();
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+
+        WebElement linkElement = driver.findElement(By.linkText("OrangeHRM, Inc"));
+        linkElement.click();
+
+        Set<String> handles = driver.getWindowHandles();
+        handles.stream().map(x -> driver.switchTo().window(x).getTitle()).forEach(s -> System.out.println(s));
+
+        driver.quit();
+    }
+}
+
+OUTPUT:
+OrangeHRM
+Human Resources Management Software | OrangeHRM
+
+*********************************************************************************************************************************************************
+Browser methods: Close and Quit
+================================
+->close(): driver focus window will be closed
+->quit(): To close all opened browsers opened by driver instance
+
+*********************************************************************************************************************************************************
+Scenario: Close specific browser based on title
+===============================================
+Problem:
+->Click on any link it opens 5 tabs
+->Need to close the tab with specific title "OrangeHRM, Inc"
+Solution: 
+Click on the link
+Get window handles of all 5 opened tabs
+Switch to each tab, get title and check with expected title and then close that specific tab 
+
+
+public class WindowHandlesAndSwitchToWIndow {
+    public static void main(String[] args) {
+        WebDriver driver = new ChromeDriver();
+        driver.get("https://opensource-demo.orangehrmlive.com/web/index.php/auth/login");
+        driver.manage().window().maximize();
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+
+        WebElement linkElement = driver.findElement(By.linkText("OrangeHRM, Inc"));
+        linkElement.click();
+
+        Set<String> handles = driver.getWindowHandles();
+
+        for (String s : handles) {
+            if (driver.switchTo().window(s).getTitle().equals("OrangeHRM")) {
+                driver.close();
+            }
+        }
+    }
+}
+
+*********************************************************************************************************************************************************
+Conditional Methods
+===================
+->Methods
+element.isDisplayed()
+element.isEnabled()
+element.isSelected()
+
+->Works on WebElements
+->Returns Boolean value
+
+isDisplayed()
+To check is the element is displayed on screen or not
+Ex: Logo is displayed or not
+
+isEnabled
+To check is the element is enabled or not to perform some actions
+Ex: Text box is enabled or not to enter text
+
+isSelected
+To check is check box, radio button is selected or not
+
+->To check total number of checkbox in the page
+  driver.findElements(By.xpath("//*[@type='checkbox']")).size();
+
+
+Ex:
+public class ConditionalMethodsDemo {
+    public static void main(String[] args) {
+        WebDriver driver = new ChromeDriver();
+        driver.get("https://demo.opencart.com/en-gb?route=account/register");
+        driver.manage().window().maximize();
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+
+        WebElement firstNameTextbox = driver.findElement(By.id("input-firstname"));
+        boolean firstNameTextboxStatus = firstNameTextbox.isEnabled();
+        System.out.println("Text box is Enabled ? " + firstNameTextboxStatus);
+
+        WebElement logo = driver.findElement(By.xpath("//img[@title='Your Store']"));
+        boolean logoStatus = logo.isDisplayed();
+        System.out.println("Logo is Displayed ? " + logoStatus);
+
+        WebElement subscribeCheckbox = driver.findElement(By.xpath("//input[@id='input-newsletter']"));
+        boolean subscribeCheckboxStatus = firstNameTextbox.isSelected();
+        System.out.println("Subscribe Checkbox Selected - Before ? " + subscribeCheckboxStatus);
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        subscribeCheckbox.click();
+        System.out.println("Subscribe Checkbox Selected - After ? " + subscribeCheckboxStatus);
+
+        driver.quit();
+    }
+}
+
+*********************************************************************************************************************************************************
+Synchronization Methods
+=======================
+->If execution of automation script is faster than response of the application 
+->To keep same sync between application response and execution of automation script we use Synchronization methods.
+
+Implicitly Wait
+---------------
+->Apply wait for all the elements
+-.If it takes more than specified time then it throws exception.
+->Cant apply different time for different elements.
+
+
+driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+
+Explicit Wait
+-------------
+->Apply wait for specific element for specific condition for specific time
+->If condition satisfied within that time then it returns the Webelement else it throws exception No Such Element
+->If there is any Sync issue for any element then go for it else no need.
+->Most used
+visibilityOfELementLocated()
+
+
+Accepts: WebElement/ By Class reference
+Returns: WebElement after if satisfy condition based on specified time else it throws exception
+
+->Types of methods in ExpectedConditions class
+
+//passing By class reference
+wait.until(ExpectedConditions.presenceOfElementLocated(By.name("username")));
+
+//Passing WebElement
+WebElement loginButton = driver.findElement(By.tagName("button"));
+wait.until(ExpectedConditions.elementToBeClickable(loginButton));
+
+alertisPreset()
+elementSelectionStateToBe(
+elementToBeClickable()
+elementToBeSelected()
+presenceOfElementLocatedBy()
+presenceOfElementLocated()
+visibilityOfELementLocated()
+invisibilityOfELementLocated()
+....
+
+Ex:
+public class SynchronizationDemo {
+    public static void main(String[] args) throws InterruptedException {
+        WebDriver driver = new ChromeDriver();
+        driver.get("https://opensource-demo.orangehrmlive.com/web/index.php/auth/login");
+        driver.manage().window().maximize();
+
+        //Implicit Wait
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+
+        //Explicit Wait
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebElement userNmeTextBox = wait.until(ExpectedConditions.presenceOfElementLocated(By.name("username")));
+        userNmeTextBox.sendKeys("Admin");
+
+        WebElement passwordTextBox = driver.findElement(By.name("password"));
+        passwordTextBox.sendKeys("admin123");
+
+        WebElement loginButton = driver.findElement(By.tagName("button"));
+        loginButton.click();
+
+        Thread.sleep(3000);
+        driver.quit();
+
+    }
+}
+
+*********************************************************************************************************************************************************
+Navigate Methods
+================
+->Methods:
+driver.navigate().to("url");
+driver.navigate().back();
+driver.navigate().forward();
+driver.navigate().refresh();
+
+
+public class NavigatemethodsDemo {
+    public static void main(String[] args) {
+        WebDriver driver = new ChromeDriver();
+        driver.manage().window().maximize();
+
+        driver.get("https://www.google.com");
+        driver.navigate().to("https://www.facebook.com");
+        driver.navigate().back();
+        driver.navigate().forward();
+        driver.navigate().refresh();
+        driver.quit();
+
+    }
+}
+
+Difference between get() and navigate().to()
+--------------------------------------------
+get()
+->waits for page to load while opening
+->parameter only string 
+
+navigate().to()
+->internally calls get(), by converting object format to string format if url is of form object type
+->acceps url in string and url class reference
+
+URL url=new URL("https://www.google.com");
+driver.navigate().to(url);
+
+*********************************************************************************************************************************************************
+Browser windows
+===============
+->Methods
+driver.getWindowHandle()
+driver.getWindowHandles()
+driver.switchTo().window(Strig handle)
+
+->To switch to child windows
+
+Ex:
+public class BrowserWindow {
+    public static void main(String[] args) throws InterruptedException {
+        WebDriver driver = new ChromeDriver();
+        driver.manage().window().maximize();
+        driver.get("https://opensource-demo.orangehrmlive.com/web/index.php/auth/login");
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+
+        driver.findElement(By.linkText("OrangeHRM, Inc")).click();
+        Thread.sleep(3000);
+
+        Set<String> handles = driver.getWindowHandles();
+        Iterator<String> it = handles.iterator();
+
+        while (it.hasNext()) {
+            String handle = it.next();
+            driver.switchTo().window(handle);
+            if (title.equalsIgnoreCase("Human Resources Management Software | OrangeHRM")) {
+                driver.findElement(By.xpath("(//button[text()='Book a Free Demo'])[2]")).click();
+                String text = driver.findElement(By.xpath("//h1[contains(text(),'Manage Your People and Operations')]")).getText();
+                System.out.println("String Text: " + text);
+            }
+        }
+        driver.quit();
+    }
+}
+
+*********************************************************************************************************************************************************
+Chekbox and Radiobuttons
+========================
+->Methods
+element.click()
+element.isSelected()
+
+->Identify the checkbox web element and click() on it
+
+Ex:
+public class CheckboxAndRadioButtons {
+    public static void main(String[] args) throws InterruptedException {
+        WebDriver driver = new ChromeDriver();
+        driver.manage().window().maximize();
+        driver.get("https://testautomationpractice.blogspot.com/");
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+
+        System.out.println("****Checkbox*****");
+        WebElement daysCheckbox = driver.findElement(By.id("sunday"));
+        System.out.println(daysCheckbox.isSelected());
+        daysCheckbox.click();
+        System.out.println(daysCheckbox.isSelected());
+
+        System.out.println("****Radio Button*****");
+        WebElement genderRadiobutton = driver.findElement(By.id("female"));
+        System.out.println(genderRadiobutton.isSelected());
+        genderRadiobutton.click();
+        System.out.println(genderRadiobutton.isSelected());
+        Thread.sleep(3000);
+        driver.quit();
+
+
+    }
+}
+
+Ex: To select all the checkboxes and count it
+
+public class CheckboxAndRadioButtons {
+    public static void main(String[] args) throws InterruptedException {
+        WebDriver driver = new ChromeDriver();
+        driver.manage().window().maximize();
+        driver.get("https://testautomationpractice.blogspot.com/");
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+
+        //To select all checkbox and count it
+        List<WebElement> allCheckbox = driver.findElements(By.xpath("//*[@type='checkbox']"));
+        System.out.println("Total number of checkboxes: "+allCheckbox.size());
+        for (WebElement checkBox : allCheckbox) {
+            checkBox.click();
+        }
+
+        driver.quit();
+
+
+    }
+}
+
+*********************************************************************************************************************************************************
+Alerts  or Popup
+================
+->Methods
+Alert alert=driver.switchTo().alert();
+alert.accept()
+alert.dismiss()
+alert.sendkeys("");
+alert().getText();
+
+Types
+-----
+Normal Alert
+Confirmation Alert
+Prompt Alert
+
+->Without switch command handling alert window.
+Using explicit wait
+
+Ex:
+public class AlertClassDemo {
+    public static void main(String[] args) throws InterruptedException {
+        WebDriver driver = new ChromeDriver();
+        driver.manage().window().maximize();
+        driver.get("https://testautomationpractice.blogspot.com/");
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+
+        //Using Switch command
+        driver.findElement(By.xpath("//button[text()='Prompt']")).click();
+        Alert alert = driver.switchTo().alert();
+        alert.sendKeys("appu boss");
+        alert.accept();
+
+        //Using Explicit wait
+        driver.findElement(By.xpath("//button[text()='Prompt']")).click();
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        Alert alert = wait.until(ExpectedConditions.alertIsPresent());
+        Thread.sleep(5000);
+        alert.accept();
+
+    }
+}
+
+Authentication Popup
+--------------------
+->Need to provide username and password a part of url
+Ex:https://the-internet.herokuapp.com/basic_auth
+Ex:https://admin:admin@the-internet.herokuapp.com/basic_auth
+Syntax:https://username:password@the-internet.herokuapp.com/basic_auth
+
+Ex:
+public class AuthenticationPopup {
+    public static void main(String[] args) {
+
+        WebDriver driver = new ChromeDriver();
+        driver.manage().window().maximize();
+        driver.get("https://admin:admin@the-internet.herokuapp.com/basic_auth");
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+    }
+}
+
+*********************************************************************************************************************************************************
+Frames
+======
+->Methods
+driver.switchTo().frame("");
+id/name/web element/index
+driver.switchTo().defaultContent();
+
+->Tag: frame or iframe
+->Switch to frame and perform application, then switch back to default content.
+
+Ex:
+public class FrameDemo {
+    private static String appu;
+
+    public static void main(String[] args) throws InterruptedException {
+        WebDriver driver = new ChromeDriver();
+        driver.manage().window().maximize();
+        driver.get("https://ui.vision/demo/webtest/frames/");
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+
+        WebElement frame1 = driver.findElement(By.xpath("//frame[@src='frame_1.html']"));
+        driver.switchTo().frame(frame1);
+        Thread.sleep(3000);
+        driver.findElement(By.xpath("//input[@name='mytext1']")).sendKeys("appu");
+        Thread.sleep(3000);
+
+    }
+}
+
+*********************************************************************************************************************************************************
+Switching methods
+=================
+driver.switchTo().window("Handle");
+driver.swithcTo().alert();
+diver.switchTo().frame("id/name/webelement/index
+");
+
+*********************************************************************************************************************************************************
+Dropdown
+========
+->Types
+Select Dropdown
+Bootstrap Dropdown
+Hidden Dropdown
+Auto suggestive dropdown
+
+Select dropdown
+-----------------
+->It has Select tag
+Methods:
+Select select = new Select(driver.findElement(By.id("colors")));
+select.selectByValue("Blue");
+select.selectByIndex("Blue"); //index starts from 0
+select.selectByVisibleText("Blue");
+select.getFirstSelectedOption();
+select.getOptions();
+select.isMultiple(); //to check is it multi selected or not
+
+Ex: Single select dropdown
+public class SelectDropdownDemo {
+    public static void main(String[] args) throws InterruptedException {
+        WebDriver driver = new ChromeDriver();
+        driver.manage().window().maximize();
+        driver.get("https://testautomationpractice.blogspot.com/");
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+
+        Select select = new Select(driver.findElement(By.id("colors")));
+        select.selectByValue("blue");
+        System.out.println("Selected value is:" + select.getFirstSelectedOption());
+
+        List<WebElement> list = select.getOptions();
+        list.stream().map(s -> s.getText()).forEach(s -> System.out.println("Value is: " + s));
+
+        Thread.sleep(5000);
+        driver.quit();
+    }
+}
+
+Ex: Multi select dropdown
+public class MultiSelectDemo {
+    public static void main(String[] args) throws InterruptedException {
+        WebDriver driver = new ChromeDriver();
+        driver.manage().window().maximize();
+        driver.get("https://jquery-az.com/boots/demo.php?ex=63.0_2");
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+
+        //Multi Select
+        try {
+            Select s = new Select(driver.findElement(By.id("option-droup-demo")));
+            System.out.println(s.isMultiple());
+
+            List<WebElement> l = s.getAllSelectedOptions();
+            l.stream().map(x -> x.getText()).forEach(x -> System.out.println("Multi Value is: " + x));
+
+            s.deselectAll();
+
+            List<WebElement> l2 = s.getAllSelectedOptions();
+            l2.stream().map(x -> x.getText()).forEach(x -> System.out.println("Multi Value is: " + x));
+
+            List<WebElement> li = s.getOptions();
+            li.stream().map(x -> x.getText()).forEach(x -> System.out.println("Value is:" + x));
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        Thread.sleep(5000);
+        driver.quit();
+    }
+}
+
+
+Bootstrap dropdown
+------------------
+->Itentify generic xpath and work on it
+
+public class BootStrapDropdownDemo {
+    public static void main(String[] args) throws InterruptedException {
+        WebDriver driver = new ChromeDriver();
+        driver.manage().window().maximize();
+        driver.get("https://jquery-az.com/boots/demo.php?ex=63.0_2");
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+
+        driver.findElement(By.xpath("//button[contains(@class,'multiselect')]")).click();
+
+
+        //Multi Select options
+        List<String> list = Arrays.asList("Oracle", "MySQL", "Java", "Python");
+        String text = "C#";
+        String xp = "//input[contains(@value,'"+text+"')]";
+        System.out.println(xp);
+
+        for (String s : list) {
+            String newXp=xp.replace(text, s);
+            System.out.println("New Xpath is: "+newXp);
+            driver.findElement(By.xpath(newXp)).click();
+            Thread.sleep(3000);
+        }
+
+
+        driver.quit();
+    }
+}
+
+Dynamic dropdown/Hidden Dropdown
+-------------------------------
+->Loads the option on click on it
+->Steps:
+Identify generic xpath using debugger
+Iterate and get required element and click on it
+Ex:
+public class HiddenDropdownDemo {
+    public static void main(String[] args) throws InterruptedException {
+        WebDriver driver = new ChromeDriver();
+        driver.manage().window().maximize();
+        driver.get("https://opensource-demo.orangehrmlive.com/web/index.php/auth/login");
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+
+        driver.findElement(By.xpath("//input[@name='username']")).sendKeys("Admin");
+        driver.findElement(By.xpath("//input[@name='password']")).sendKeys("admin123");
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebElement ele = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[@type='submit']")));
+        // driver.findElement(By.xpath("(//button[@type='submit']")).click();
+        ele.click();
+
+        driver.findElement(By.xpath("//span[text()='PIM']")).click();
+
+        driver.findElement(By.xpath("//label[text()='Job Title']/parent::div/following-sibling::div/div/div/div")).click();
+
+        List<WebElement> list = driver.findElements(By.xpath("//div[contains(@class,'oxd-select-option')]/span"));
+        System.out.println("Total options are: " + list.size());
+        list.stream().map(x -> x.getText()).forEach(x -> System.out.println("Option is: " + x));
+
+        //Selecting element
+        for (WebElement e : list) {
+            if (e.getText().equalsIgnoreCase("Automaton Tester")) {
+                e.click();
+                break;
+            }
+        }
+        Thread.sleep(4000);
+        driver.quit();
+    }
+}
+
+Autosuggested Dropdown
+----------------------
+->Type, get generic xpath
+->Iterate and select required
+
+Ex:
+
+public class AutosugestiveDropwdownDemo {
+    public static void main(String[] args) {
+        WebDriver driver = new ChromeDriver();
+        driver.manage().window().maximize();
+        driver.get("https://www.google.co.in/");
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+
+        driver.findElement(By.name("q")).sendKeys("selenium");
+        List<WebElement> list=driver.findElements(By.xpath("//ul[@class='G43f7e']//li//span"));
+
+        for(WebElement e:list)
+        {
+//            if(!(e.getText().isEmpty()))
+//            {
+//                System.out.println(e.getText());
+//            }
+            if(e.getText().equalsIgnoreCase("selenium testing"))
+            {
+                e.click();
+                break;
+            }
+        }
+
+        driver.quit();
+    }
+}
+
+*********************************************************************************************************************************************************
+Web Table
+========
+Types:
+->Static
+->Dynamic
+->Pagination
+
+Static Web table
+-----------------
+Ex: Table tag will be used, data is static
+
+
+public class StaticWebtableDemo {
+    public static void main(String[] args) {
+
+        WebDriver driver = new ChromeDriver();
+        driver.manage().window().maximize();
+        driver.get("https://testautomationpractice.blogspot.com/");
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+
+        //Total no or records
+        List<WebElement> table = driver.findElements(By.xpath("//table[@name='BookTable']//tr"));
+        System.out.println("Total no of Records is: " + table.size());
+
+        //Total no of columns
+        System.out.println("Total no of columns: " + driver.findElements(By.xpath("//table[@name='BookTable']/tbody/tr[1]/th")).size());
+
+        List<WebElement> e1 = driver.findElements(By.xpath("//table[@name='BookTable']/tbody//tr[1]/th"));
+        for (WebElement w : e1) {
+            System.out.print(w.getText() + "\t");
+        }
+        System.out.println();
+
+        //Read all cell data
+        for (int i = 2; i <= table.size(); i++) {
+            List<WebElement> e = driver.findElements(By.xpath("//table[@name='BookTable']/tbody//tr[" + i + "]/td"));
+            for (WebElement w : e) {
+                System.out.print(w.getText() + "\t");
+            }
+            System.out.println();
+        }
+
+        //Read Specific cell data
+        System.out.println(driver.findElement(By.xpath("//table[@name='BookTable']/tbody//tr[2]/td[2]")).getText());
+
+
+        //Print book of author Mukesh
+        for (int i = 2; i <= table.size(); i++) {
+            List<WebElement> e = driver.findElements(By.xpath("//table[@name='BookTable']/tbody//tr[" + i + "]/td[2]"));
+            for (WebElement w : e) {
+                if (w.getText().equalsIgnoreCase("Mukesh")) {
+                    WebElement s = driver.findElement(By.xpath("//table[@name='BookTable']/tbody//tr[" + i + "]/td[1]"));
+                    System.out.println("Book name is: " + s.getText());
+                    break;
+                }
+            }
+        }
+
+        List<Integer> list=new ArrayList<>();
+        int price=0;
+        //Total price of all books
+        for (int i = 2; i <= table.size(); i++) {
+            List<WebElement> e = driver.findElements(By.xpath("//table[@name='BookTable']/tbody//tr[" + i + "]/td[4]"));
+            for (WebElement w : e) {
+               String s=w.getText();
+               int p=Integer.parseInt(s);
+               list.add(p);
+               price=price+p;
+            }
+        }
+        System.out.println("Total price is:"+price);
+
+        //To find lowest and highest price
+        Collections.sort(list);
+        System.out.println("Lowest price is:"+list.get(0));
+        System.out.println("Highest price is:"+list.get(list.size()-1));
+
+        driver.quit();
+    }
+}
+
+Dynamic WebTable with Pagination
+-------------------------------
+->Identify total pages using substring method
+->Iterate pages and grab the content from each page using generic xpath and table tab [static web table concept]
+
+Ex:
+public class DynamicTableWithNavigation {
+    public static void main(String[] args) throws InterruptedException {
+        WebDriver driver = new ChromeDriver();
+        // WebDriver driver=new FirefoxDriver();
+        driver.manage().window().maximize();
+        driver.manage().deleteAllCookies();
+        driver.get("http://makeseleniumeasy.com/2020/05/09/storing-web-table-with-pagination-data-into-list-of-map-java/");
+
+        String text = driver.findElement(By.xpath("//div[contains(text(),'Showing')]")).getText();
+//        String pageNumber = text.substring((text.indexOf("of"))+2, text.indexOf(" ent"));
+//        System.out.println("page Number is" + pageNumber);
+        int pageNumber = Integer.parseInt(text.substring((text.indexOf("of")) + 2, text.indexOf(" ent")).trim());
+        System.out.println(pageNumber);
+
+        printdata(driver);
+        System.out.println("**********************************************************************");
+        for (int i = 2; i <pageNumber; i++) {
+            driver.findElement(By.xpath("//a[normalize-space()='" + i + "']")).click();
+            Thread.sleep(2000);
+            System.out.println("**********************************************************************");
+            printdata(driver);
+        }
+        // printdata(driver);
+
+
+        driver.quit();
+
+
+    }
+
+    public static void printdata(WebDriver driver) {
+        List<WebElement> list = driver.findElements(By.xpath("(//table[@id='dtBasicExample'])[1]//tbody/tr"));
+        int rowCount = list.size();
+
+        for (int i = 1; i <= rowCount; i++) {
+            int cellCount = driver.findElements(By.xpath("(//table[@id='dtBasicExample'])[1]//tbody/tr[" + i + "]/td")).size();
+            for (int j = 1; j <= cellCount; j++) {
+                String data = driver.findElement(By.xpath("(//table[@id='dtBasicExample'])[1]//tbody/tr[" + i + "]/td[" + j + "]")).getText();
+                System.out.print(data + "\t");
+            }
+            System.out.println();
+        }
+    }
+}
+
+*********************************************************************************************************************************************************
+Page Object Model
+=================
+->Design pattern which keeps Web elements and actions to be performed on separate class
+->Separate class for each pages of AUT
+
+POM Class =>Web Elements + Actions
+->Pros: Modularity and Reusability
+
+XML File[Test classes]
+Test Class=>Test Methods[Invoke POC and Validation]
+Page Object Class[Web Element and Actions]
+  
+->Implementation
+  Without using Page Factory
+	Each element will be initialized every time inside action method while using.
+  Using Page Factory		    
+        All elements will be initialized once during Constructor call[PageFactory.initElements(driver, this);]
+
+Ex:Without using Page Factory
+package pageobjects;
+import org.openqa.selenium.support.FindBy;
+
+public class HomePage{
+    
+    WebDriver driver;
+
+    public HomePage(WebDriver driver) {
+        this.driver=driver;
+    }
+
+    By lnkMyAccount_loc=By.xpath("//span[normalize-space()='My Account']//following::i");
+    
+    OR
+
+    By lnkMyAccount_loc=(how=How.XPATH,using("//span[normalize-space()='My Account']//following::i"));
+
+    public void clickMyAccount() throws InterruptedException {
+          driver.findElement(lnkMyAccount_loc).click();
+    }
+}
+
+
+
+Ex:Using Page Factory
+package pageobjects;
+import org.openqa.selenium.support.FindBy;
+
+public class HomePage {
+
+    public HomePage(WebDriver driver) {
+        this.driver = driver;
+        PageFactory.initElements(driver, this);
+    }
+
+    @FindBy(xpath = "//span[normalize-space()='My Account']//following::i")
+    WebElement lnkMyAccount;
+
+    public void clickMyAccount() throws InterruptedException {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        wait.until(ExpectedConditions.elementToBeClickable(lnkMyAccount)).click();
+    }
+}
+
+*********************************************************************************************************************************************************
+Test NG
+========
+->Java based Unit testing framework
+->Features
+  Create test cases and suites
+  Grouping and Prioritize test cases
+  Parameterization
+  Parallel testing
+  Cross browser testing
+  Report generation
+->Setup
+  Install TestNG from market place, Add dependency and library
+->TestNg execute test based on alphabetical order, to control the order of execution we need to use priority attribute
+
+Test NG XML File
+----------------
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Practice Suite">
+    <test name="Test Basics 1">
+
+        <classes>
+            <class name="testng.Annotations"/>
+        </classes>
+    </test> <!-- Test -->
+</suite> <!-- Suite -->
+
+Hierarchy:
+1 suite>1 to N test>1 to N class>1 to N methods
+
+Annotations
+------------
+@Test
+@BeforeMethod
+@AfterMethod
+@BeforeClass
+@AfterClass
+@BeforeTest
+@AfterTest
+@BeforeSuite
+@AfterSuite
+
+Ex:
+package testng;
+
+import org.testng.annotations.*;
+
+public class Annotations {
+
+
+    @BeforeSuite
+    public void openBrowser() {
+        System.out.println("Open browser...");
+    }
+
+    @BeforeTest
+    public void openApp() {
+        System.out.println("Open APP....");
+    }
+
+    @BeforeClass
+    public void login() {
+        System.out.println("Login ...");
+    }
+
+    @AfterClass
+    public void logout() {
+        System.out.println("Logout....");
+    }
+
+    @AfterTest
+    public void closeApp() {
+        System.out.println("Close App...");
+    }
+
+    @AfterSuite
+    public void closeBrowser() {
+        System.out.println("Close browser...");
+    }
+
+    @BeforeMethod
+    public void beforeMethodMessage() {
+        System.out.println("Execution started...");
+    }
+
+    @AfterMethod
+    public void afterMethodMessage() {
+        System.out.println("Execution ended...");
+    }
+
+    @Test
+    public void createUser() {
+        System.out.println("User Created...");
+    }
+
+    @Test
+    public void deleteUser() {
+        System.out.println("User Deleted...");
+    }
+}
+
+
+OUTPUT:
+Open browser...
+Open APP....
+Login ...
+Execution started...
+User Created...
+Execution ended...
+Execution started...
+User Deleted...
+Execution ended...
+Logout....
+Close App...
+Close browser...
+
+->If any configuration methods[before or after] fails then all further configuration or test methods will be skipped.
+->If any test method fails then only that method execution will be failed remaining will be executed.
+
+Attributes
+----------
+->priority=1
+  Default priority is 0 and alphabetical order
+  If same priority for multiple method then it considers alphabetical order
+  Priority order: neg 0 positive
+Ex:
+    @Test(priority=1)
+    public void openBrowser() {
+        System.out.println("Open browser...");
+    }
+
+->dependsOnMethods={"name of the method","name of the method"}
+  If the dependant method failed, then this method will be skipped.
+
+->Grouping
+  Assign methods to specific groups
+  dependsOnGroups={"group name","group name"}
+In @Test  
+groups={"regression", "sanity"}
+
+In XML file
+  <suite
+    <test
+      <groups> <run> 
+          <include name=""  />
+          <include name=""  />
+          <exclude name=""  />
+       </run> </groups>
+     <classes>  
+             <class name= ""/>
+     </classes>
+    </test>
+  </suite>
+      
+Assertions
+----------
+->To add the validation
+Assert.assertEquals(actual,expcted,mesage);
+->Types
+	Hard Assert: If test fails, then that test method will be failed and moves to next test method. Final status will be failed for that test method.
+	Soft Assert: If test fails also it continues with that test method until softAssert.assertAll() statement. Final status will be failed for that test method.
+
+Ex: Hard Assert
+import org.testng.Assert;
+import org.testng.asserts.SoftAssert;
+
+public class HardAndSoftAssert {
+
+    SoftAssert s = new SoftAssert();
+
+    @BeforeMethod
+    public void beforeMethodMessage() {
+        System.out.println("Execution started...");
+
+    }
+
+    @AfterMethod
+    public void afterMethodMessage() {
+        System.out.println("Execution ended...");
+
+    }
+
+    @Test
+    public void createUser() {
+        System.out.println("User Created...");
+        Assert.fail();
+        System.out.println("After user created"); //Not executed for hard assert, execute for Soft assert
+    }
+
+    @Test
+    public void deleteUser() {
+        System.out.println("User Deleted...");
+    }
+}
+
+OUTPUT: 
+Execution started...
+User Created...
+java.lang.AssertionError: null
+Execution ended...
+
+Execution started...
+User Deleted...
+Execution ended...
+
+===============================================
+Practice Suite
+Total tests run: 2, Passes: 1, Failures: 1, Skips: 0
+===============================================
+
+Ex: Soft Assert
+import org.testng.Assert;
+import org.testng.asserts.SoftAssert;
+
+public class HardAndSoftAssert {
+
+    SoftAssert s = new SoftAssert();
+
+    @BeforeMethod
+    public void beforeMethodMessage() {
+        System.out.println("Execution started...");
+
+    }
+
+    @AfterMethod
+    public void afterMethodMessage() {
+        System.out.println("Execution ended...");
+
+    }
+
+    @Test
+    public void createUser() {
+        System.out.println("User Created...");
+        s.fail();
+        System.out.println("After user created"); //Not executed for hard assert, execute for Soft assert
+	s.assertAll();
+    }
+
+    @Test
+    public void deleteUser() {
+        System.out.println("User Deleted...");
+    }
+}
+
+OUTPUT:
+Execution started...
+User Created...
+After user created
+
+java.lang.AssertionError: The following asserts failed:
+Execution ended...
+Execution started...
+User Deleted...
+Execution ended...
+
+===============================================
+Practice Suite
+Total tests run: 2, Passes: 1, Failures: 1, Skips: 0
+===============================================
+
+Parameterization
+----------------
+Types:
+     Using DataProvider Annotation
+     TestNG XML file
+
+Using Data Provider Annotation:
+->Passing test data from data provider class to test method
+->@DataProvider annotataion/dataprovider attribute
+->No of input in data provider method = No of times test method will be executed
+->Data can keep inside data provider method or keep in excel file
+->Return type of data provider method is 2D array
+@Test(dataProvider = "dp", dataProviderClass = DataProviderClass.class)
+@DataProvider(name = "dp")
+
+Ex:
+public class DataProvider1 {
+    @BeforeMethod
+    public void beforeMessage() {
+        System.out.println("Test started");
+    }
+
+    @AfterMethod
+    public void afterMessage() {
+        System.out.println("Test ended");
+    }
+
+    @Test(dataProvider = "dp", dataProviderClass = DataProviderClass.class)
+    public void login(String un, String pw,String status) {
+        System.out.println("User name:" + un);
+        System.out.println("Password:" + pw);
+        System.out.println("Status:" + status);
+    }
+}
+
+
+public class DataProviderClass {
+
+    @DataProvider(name = "dp")
+    public String[][] getData() {
+        String data[][] = {
+                {"appu", "appu123","valid"}, {"shivu", "shivu123","invalid"}
+        };
+
+        return data;
+    }
+}
+
+OUTPUT:
+Test started
+User name:appu
+Password:appu123
+Status:valid
+Test ended
+Test started
+User name:shivu
+Password:shivu123
+Status:invalid
+Test ended
+
+
+Using XML file:
+->@Parameters({"browser"})/<parameter name="browser" value="chrome"></parameter>
+
+Ex:
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Practice Suite">
+    <test name="Test Basics 1">
+        <parameter name="browser" value="chrome"></parameter>
+        <parameter name="os" value="windows"></parameter>
+        <classes>
+            <class name="testng.DataParameterizationUsingXMlFIle"/>
+        </classes>
+    </test> <!-- Test -->
+</suite> <!-- Suite -->
+
+public class DataParameterizationUsingXMlFIle {
+
+    @BeforeMethod
+    @Parameters({"browser","os"})
+    public void beforeMessage(String br,String os) {
+        System.out.println("Test started in " + br.toUpperCase() + " browser and "+os.toUpperCase()+" OS");
+    }
+
+    @AfterMethod
+    public void afterMessage() {
+        System.out.println("Test ended");
+    }
+
+    @Test()
+    public void login() {
+        System.out.println("Test method...");
+    }
+}
+
+OUTPUT:
+Test started in CHROME browser and WINDOWS OS
+Test method...
+Test ended
+
+Parallel Testing
+----------------
+->Use attribute parallel in suite tag in xml
+<suite name="Practice Suite" parallel="tests" thread-count="2">
+->thread-count: To create no of threads at max 6 to execute the test
+->attribute value can be tests, classes, methods
+
+Ex:
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Practice Suite" parallel="tests" thread-count="2">
+    <test name="Test Basics 1">
+        <parameter name="browser" value="chrome"></parameter>
+        <parameter name="os" value="windows"></parameter>
+        <classes>
+            <class name="testng.ParallelTesting"/>
+        </classes>
+    </test> <!-- Test -->
+
+    <test name="Test Basics 2">
+        <parameter name="browser" value="firefox"></parameter>
+        <parameter name="os" value="linux"></parameter>
+        <classes>
+            <class name="testng.ParallelTesting"/>
+        </classes>
+    </test> <!-- Test -->
+</suite> <!-- Suite -->
+
+
+public class ParallelTesting {
+
+    @BeforeMethod
+    @Parameters({"browser","os"})
+    public void beforeMessage(String br,String os) {
+        System.out.println("Test started in " + br.toUpperCase() + " browser and "+os.toUpperCase()+" OS");
+    }
+
+    @AfterMethod
+    public void afterMessage() {
+        System.out.println("Test ended");
+    }
+
+    @Test()
+    public void login1() {
+        System.out.println("Test method1...");
+    }
+
+    @Test()
+    public void login2() {
+        System.out.println("Test method2...");
+    }
+}
+
+OUTPUT:
+Test started in CHROME browser and WINDOWS OS
+Test started in FIREFOX browser and LINUX OS
+Test method1...
+Test method1...
+Test ended
+Test ended
+Test started in FIREFOX browser and LINUX OS
+Test method2...
+Test started in CHROME browser and WINDOWS OS
+Test ended
+Test method2...
+Test ended
+
+===============================================
+Practice Suite
+Total tests run: 4, Passes: 4, Failures: 0, Skips: 0
+===============================================
+
+Test NG Listeners
+-----------------
+->Interface[ITestListeners] which monitors the test method execution status[post actions], pass, fail, skipped.
+Steps:
+ Create test method
+ Create Listener class implementing ITestListener interface
+ Create XML file and include both test method class and listener class
+
+<listeners>
+        <listener class-name="testng.ListenerInterface"></listener>
+</listeners>
+
+->Implements ITestListener interface
+  Extends TestListenerAdapter
+
+Methods in ITestListener
+onStart(ITestContext context): Before test tag in xml file
+onFinish(ITestContext context): After test tag in xml file
+onTestStart(ITestResult result): Before each test method starts
+onTestSuccess(ITestResult result):After each test method PASS 
+onTestFailure(ITestResult result):After each test method FAIL
+onTestSkipped(ITestResult result):After each test method SKIPPED
+
+
+Ex: Test Class
+public class TestngListenersDemo {
+    @Test
+    public void test1() {
+        System.out.println("Test 1...");
+    }
+
+    @Test
+    public void test2() {
+        //System.out.println("Test2...");
+        Assert.fail();
+    }
+
+    @Test(dependsOnMethods = {"test2"})
+    public void test3() {
+        System.out.println("Test3...");
+    }
+
+    @BeforeClass
+    public void open()
+    {
+        System.out.println("Before class ...");
+    }
+
+    @AfterClass
+    public void close()
+    {
+        System.out.println("After class...");
+    }
+}
+
+
+Ex: Listener class
+public class ListenerInterface implements ITestListener {
+    //Invoked before running all the test methods [test tag of xml file] belonging to the classes
+    public void onStart(ITestContext context) {
+        System.out.println("Before test tag in xml file");
+    }
+
+    //Invoked after all the test methods [test tag of xml file] belonging to the classes
+    public void onFinish(ITestContext context) {
+        System.out.println("After test tag in xml file");
+    }
+
+    //Invoked each time before a test method will be invoked
+    public void onTestStart(ITestResult result) {
+        System.out.println("Before each test method starts");
+    }
+
+    //Invoked each time a test succeeds.
+    public void onTestSuccess(ITestResult result) {
+        System.out.println("After each test method PASS");
+    }
+
+    //Invoked each time a test fails.
+    public void onTestFailure(ITestResult result) {
+        System.out.println("After each test method FAIL");
+    }
+
+    //Invoked each time a test is skipped.
+    public void onTestSkipped(ITestResult result) {
+        System.out.println("After each test method SKIPPED");
+    }
+
+    //Invoked each time a method fails but has been annotated with successPercentage and this failure
+    //still keeps it within the success percentage requested.
+    public void onTestFailedButWithinSuccessPercentage(ITestResult result) {
+    }
+
+    //Invoked each time a test fails due to a timeout.
+    public void onTestFailedWithTimeout(ITestResult result) {
+        onTestFailure(result);
+    }
+}
+
+Ex: Listener.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Practice Suite">
+    <listeners>
+        <listener class-name="testng.ListenerInterface"></listener>
+    </listeners>
+    <test name="Test Basics 1">
+        <classes>
+            <class name="testng.TestngListenersDemo"/>
+        </classes>
+    </test> <!-- Test -->
+</suite> <!-- Suite -->
+
+OUTPUT:
+Before test tag in xml file
+Before class ...
+Before each test method starts
+Test 1...
+After each test method PASS
+Before each test method starts
+After each test method FAIL
+java.lang.AssertionError: null
+Before each test method starts
+After each test method SKIPPED
+Test ignored.
+After class...
+After test tag in xml file
+
+===============================================
+Practice Suite
+Total tests run: 3, Passes: 1, Failures: 1, Skips: 1
+===============================================
+
+->To trigger listener class without xml file
+@Listeners(testng.ListenerInterface.class)
+public class TestngListenersDemo {
+    @Test
+    public void test1() {
+        System.out.println("Test 1...");
+    }
+}
+
+*********************************************************************************************************************************************************
+Extent Reports
+==============
+->Add dependency
+        <dependency>
+            <groupId>com.aventstack</groupId>
+            <artifactId>extentreports</artifactId>
+            <version>5.1.2</version>
+        </dependency>
+
+->Create Listener class
+ExtentSparkReporter- Used for UI of the report
+ExtentReports-Common info of the report Ex: Who executing, Browser name, OS name,...
+ExtentTest-Create entries for each test methods and update the status of the test method, info,warn,error logs.
+
+onStart()
+ExtentSparkReporter class 
+  Create report template
+     Location, Report title, Report name,  Theme, ...
+  
+ExtentReports class 
+  Common info, Ex: Browser, Tester, OS,...
+
+onTestStart()
+ExtentTest class
+  Create entry in report for test method
+ontestSuccess,Pass,Failure()
+ExtentTest class
+  Update status and log info,warn,error
+
+onFinsh()
+ExtentReports class
+  Flush the report
+
+->Create Test class and its methods
+->Update XML file with Listener class and Test class
+
+
+Ex: Listener class
+package testng;
+
+import com.aventstack.extentreports.ExtentReports;
+import com.aventstack.extentreports.ExtentTest;
+import com.aventstack.extentreports.Status;
+import com.aventstack.extentreports.reporter.ExtentSparkReporter;
+import com.aventstack.extentreports.reporter.configuration.Theme;
+import org.testng.ITestContext;
+import org.testng.ITestListener;
+import org.testng.ITestResult;
+
+public class ExtentReportManager implements ITestListener {
+
+    public ExtentSparkReporter sparkReporter;  // UI of the report
+    public ExtentReports extent;  //populate common info on the report
+    public ExtentTest test; // creating test case entries in the report and update status of the test methods
+
+    public void onStart(ITestContext context) {
+
+        sparkReporter = new ExtentSparkReporter(System.getProperty("user.dir") + "/extentreportstemp/myReport.html");//specify location of the report
+
+        sparkReporter.config().setDocumentTitle("Automation Report"); // TiTle of report
+        sparkReporter.config().setReportName("Functional Testing"); // name of the report
+        sparkReporter.config().setTheme(Theme.STANDARD);
+
+        extent = new ExtentReports();
+        extent.attachReporter(sparkReporter);
+
+        extent.setSystemInfo("Computer Name", "localhost");
+        extent.setSystemInfo("Environment", "QA");
+        extent.setSystemInfo("Tester Name", "Nandeesh");
+        extent.setSystemInfo("os", "Windows10");
+        extent.setSystemInfo("Browser name", "Chrome");
+
+    }
+
+
+    public void onTestSuccess(ITestResult result) {
+
+        test = extent.createTest(result.getName()); // create a new enty in the report
+        test.log(Status.PASS, "Test case PASSED is:" + result.getName()); // update status p/f/s
+
+    }
+
+    public void onTestFailure(ITestResult result) {
+
+        test = extent.createTest(result.getName());
+        test.log(Status.FAIL, "Test case FAILED is:" + result.getName());
+        test.log(Status.FAIL, "Test Case FAILED cause is: " + result.getThrowable());
+
+    }
+
+    public void onTestSkipped(ITestResult result) {
+
+        test = extent.createTest(result.getName());
+        test.log(Status.SKIP, "Test case SKIPPED is:" + result.getName());
+
+    }
+
+
+    public void onFinish(ITestContext context) {
+
+        extent.flush();
+    }
+}
+
+Ex: Test class
+package testng;
+
+import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+public class ExtentReportDemo {
+
+    @Test
+    public void test1() {
+        System.out.println("Test 1...");
+    }
+
+    @Test
+    public void test2() {
+        //System.out.println("Test2...");
+        Assert.fail();
+    }
+
+    @Test(dependsOnMethods = {"test2"})
+    public void test3() {
+        System.out.println("Test3...");
+    }
+
+    @BeforeClass
+    public void open()
+    {
+        System.out.println("Before class ...");
+    }
+
+    @AfterClass
+    public void close()
+    {
+        System.out.println("After class...");
+    }
+}
+
+
+Ex: ExtentReport XMl file
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Practice Suite">
+    <listeners>
+        <listener class-name="testng.ExtentReportManager"></listener>
+    </listeners>
+    <test name="Test Basics 1">
+        <classes>
+            <class name="testng.ExtentReportDemo"/>
+        </classes>
+    </test> <!-- Test -->
+</suite> <!-- Suite -->
+   
+***********************************************************************************************************************************************
+Actions Class: Mouse events
+===========================
+->To perform mouse events
+->Uses Actions class
+Ex: Mouse over, Right click, Double click, Drag and drop
+->build(): To create/RT: Action
+  perform(): To execute/RT: void
+
+Ex: 
+Actions actions = new Actions(driver);  
+Action action=actions.click(element).build();
+action.perform();
+
+Mouse over:
+Actions actions = new Actions(driver);    
+actions.moveToElement(element).build().perform();
+
+Click:
+actions.click(element).build().perform();
+
+Right click:
+actions.moveToElement(element2).contextClick().build().perform();
+
+Drag and Drop:
+actions.dragAndDrop(source,destination).build().perform();
+
+DragAndDropBy() [Slider]:
+Used to move element x or y axis [slider]
+->Identify slider, store into WebElement
+->Get its x and y co ordinates using getLocation()
+->Use Actions class method action.dragAndDropBy(WebElement,X axis value,Y axis value).build().perform();
+
+->Other actions:
+actions.srollToElement(element).build().perform();
+actions.doubleClick(element).build().perform();
+actions.sendKeys(element,character sequence).build().perform();
+actions.sendKeys(character sequence).build().perform();
+actions.keyDown(character sequence).build().perform();
+actions.keyUp(character sequence).build().perform();
+
+
+Ex:
+package org.appu.seleniumbasics;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.interactions.Actions;
+
+import java.time.Duration;
+
+public class ActionsClassDemo1 {
+
+    public static void main(String[] args) throws InterruptedException {
+        WebDriver driver = new ChromeDriver();
+        driver.manage().window().maximize();
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+        driver.get("https://demo.opencart.com/");
+        WebElement element = driver.findElement(By.xpath("//a[text()='Desktops']"));
+        Actions actions = new Actions(driver);
+        actions.moveToElement(element).build().perform();
+        Thread.sleep(5000);
+        WebElement element2 = driver.findElement(By.xpath("//a[text()='Mac (1)']"));
+        actions.moveToElement(element2).contextClick().build().perform();
+        Thread.sleep(5000);
+        actions.click(element2).build().perform();
+        Thread.sleep(5000);
+        driver.quit();
+    }
+}
+
+************************************************************************************************************************************************
+getText() vs getAttribute()
+---------------------------
+->Using getText() we can able to get value of the inner text, using getAttribute() we can get value of any specific attribute.
+WebElement.getText();
+WebElement.getAttribute();
+
+************************************************************************************************************************************************
+Keyboard Actions using Actions class
+====================================
+Ex: To press control and send c [copy]
+Actions actions=new Actions(driver);
+actions.click(driver.findElement(By.xpath("//textarea[@name='text1']"))).keyDown(Keys.CONTROL)
+.sendKeys("A").sendKeys("C").keyUp(Keys.CONTROL).build().perform();
+
+Ex: Open link in new tab
+Control and Click on link
+
+public class OpenLinkInNewTabScenario {
+
+    public static void main(String[] args) throws InterruptedException {
+        WebDriver driver = new ChromeDriver();
+        driver.manage().window().maximize();
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+        driver.manage().deleteAllCookies();
+
+        driver.get("https://demo.nopcommerce.com/");
+        Thread.sleep(10000);
+        WebElement link = driver.findElement(By.xpath("https://demo.nopcommerce.com/"));
+        Actions actions=new Actions(driver);
+        actions.keyDown(Keys.CONTROL).sendKeys(link).keyUp(Keys.CONTROL).perform();
+
+//Now get window handles, switch to the new tab and perform the operation and return back to original window
+
+    }
+}
+
+Selenium 4 feature: 
+Open new tab and switch to it 
+Ex:
+public class OpenNewTabandSwitchToIt {
+    public static void main(String[] args) {
+        WebDriver driver=new ChromeDriver();
+        driver.manage().window().maximize();
+        driver.get("https://www.google.com");
+
+        //Open and switch to new tab
+        driver.switchTo().newWindow(WindowType.TAB);
+        driver.get("https://www.flipkart.com");
+        //If we need switch back between windows then need to get window handles
+        driver.quit();
+    }
+}
+
+Open new browser window and switch to it 
+Ex:
+public class OpenNewTabandSwitchToIt {
+    public static void main(String[] args) {
+        WebDriver driver=new ChromeDriver();
+        driver.manage().window().maximize();
+        driver.get("https://www.google.com");
+
+        //Open and switch to new browser window
+        driver.switchTo().newWindow(WindowType.WINDOW);
+        driver.get("https://www.flipkart.com");
+        //If we need switch back between windows then need to get window handles
+        driver.quit();
+    }
+}
+
+************************************************************************************************************************************************
+Selenium Class and Interface Hierarch
+=====================================
+                       Search Context[I]
+	  
+                         WebDriver[I]
+ 
+JavaScriptExecutor[I]   RemoteWebDriver  TakeScreenshot[I]
+
+InternetExplorerDriver FireoxDriver      ChromiumDriver           OperaDriver  SafariDriver 
+
+				     ChromeDriver EdgeDriver
+
+************************************************************************************************************************************************
+JavaScriptExecutor
+=================
+->Interface , Implemented by RemoteWebDriver class
+->executeScript() : Used to excute JavaSciptExecutor methods 
+->Why JS in Selenium
+  If some of the Selenium method could not be executed on Webpage then we nee to use JS to work on DOM level.
+ Whenever , we execute any selenium method, internally JS code will be invoked and executed on Webpage, but due to some reasons it fails to execute the code  so that time we receive ElementIntercepted Exception. At that time we need to write and execute JS code manually on web page.
+  Frequently we see in click() and sendKeys() methods.
+
+To send values into textbox
+---------------------------
+JavascriptExecutor js=(JavascriptExecutor)driver;  //Upcasting
+js.executeScript("arguments[0].setAttribute('value','Appu')",nameTextbox);
+
+To click on Element
+-------------------
+JavascriptExecutor js=(JavascriptExecutor)driver;  //Upcasting
+js.executeScript("arguments[0].click()",newBrowserWindowButton);
+
+
+Ex:
+public class JavaScriptExecutor {
+    public static void main(String[] args) {
+        WebDriver driver = new ChromeDriver();
+        driver.manage().window().maximize();
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+
+        driver.get("https://testautomationpractice.blogspot.com/");
+
+        WebElement nameTextbox = driver.findElement(By.id("name"));
+        WebElement newBrowserWindowButton = driver.findElement(By.xpath("//button[text()='New Browser Window']"));
+
+        JavascriptExecutor js=(JavascriptExecutor)driver;  //Upcasting
+        
+        js.executeScript("arguments[0].setAttribute('value','Appu')",nameTextbox);
+        js.executeScript("arguments[0].click()",newBrowserWindowButton);
+
+    }
+}
+
+Scroll the page
+---------------
+->Scroll bar is not the Webelement
+
+->Till specific element is visible
+WebElement nicaraguaFlag=driver.findElement(By.xpath("//td[text()='Nicaragua']"));
+JavascriptExecutor js = (JavascriptExecutor) driver;  //Upcasting
+js.executeScript("arguments[0].scrollIntoView();",nicaraguaFlag);
+System.out.println("New Y Cordinates: "+js.executeScript("return window.pageYOffset;")); //To get Co ordinate value
+
+->Till end of the page
+JavascriptExecutor js=(JavascriptExecutor)driver;  //Upcasting
+js.executeScript("window.scrollBy(0,document.body.scrollHeight)");
+System.out.println("New Y Cordinates: "+js.executeScript("return window.pageYOffset;")); //To get Co ordinate value
+
+->Scroll to Top of the page
+js.executeScript("window.scrollBy(0,-document.body.scrollHeight)");
+System.out.println("New Y Cordinates: " + js.executeScript("return window.pageYOffset;"));
+
+
+->Till specified X and Y co ordinates
+JavascriptExecutor js=(JavascriptExecutor)driver;  //Upcasting
+js.executeScript("window.scrollBy(0,3000)","");
+System.out.println("New Y Cordinates: "+js.executeScript("return window.pageYOffset;")); //To get Co ordinate value
+
+Ex:
+package org.appu.seleniumbasics;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+
+import java.time.Duration;
+
+public class JavaScriptExecutorScroll {
+    public static void main(String[] args) throws InterruptedException {
+        WebDriver driver = new ChromeDriver();
+        driver.manage().window().maximize();
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+        driver.get("https://www.countries-ofthe-world.com/flags-of-the-world.html");
+
+        //Scroll to x and y cordinates :
+        JavascriptExecutor js = (JavascriptExecutor) driver;  //Upcasting
+        js.executeScript("window.scrollBy(0,6000)", "");
+        System.out.println("New Y Cordinates: " + js.executeScript("return window.pageYOffset;"));
+
+        Thread.sleep(3000);
+
+        //Scroll to specific element
+        WebElement nicaraguaFlag = driver.findElement(By.xpath("//td[text()='Nicaragua']"));
+        // JavascriptExecutor js = (JavascriptExecutor) driver;  //Upcasting
+        js.executeScript("arguments[0].scrollIntoView();", nicaraguaFlag);
+        System.out.println("New Y Cordinates: " + js.executeScript("return window.pageYOffset;"));
+
+        Thread.sleep(3000);
+
+        //Scroll Till end of the page
+        js.executeScript("window.scrollBy(0,document.body.scrollHeight)");
+        System.out.println("New Y Cordinates: " + js.executeScript("return window.pageYOffset;"));
+
+        Thread.sleep(3000);
+
+        //Scroll Till top of the page
+        js.executeScript("window.scrollBy(0,-document.body.scrollHeight)");
+        System.out.println("New Y Cordinates: " + js.executeScript("return window.pageYOffset;"));
+    }
+}
+
+
+OUTPUT:
+New Y Cordinates: 6000
+New Y Cordinates: 2538.666748046875
+New Y Cordinates: 9485.3330078125
+New Y Cordinates: 0
+
+To Zoom page for specific percentage
+------------------------------------
+JavascriptExecutor js=(JavascriptExecutor)driver;  //Upcasting
+js.executeScript("document.body.style.zoom='50%'");
+
+************************************************************************************************************************************************
+File Upload
+===========
+->Not recommended by Selenium
+->Try not to automate such scenarios
+->Using sendKeys()
+
+Ex: Uploading Single and Multiple files
+package org.appu.seleniumbasics;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+
+import java.time.Duration;
+
+public class FileUploadUsingSendKeys {
+    public static void main(String[] args) {
+        WebDriver driver=new ChromeDriver();
+        driver.manage().window().maximize();
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+
+        driver.get("https://davidwalsh.name/demo/multiple-file-upload.php");
+
+        //Single file upload
+//        WebElement singleFileUplaod=driver.findElement(By.xpath("//input[@name='filesToUpload']"));
+//        singleFileUplaod.sendKeys("C:\\Users\\003J72744\\Downloads\\Performance Test Plan V1.0.doc");
+//        System.out.println("File uploaded is: "+driver.findElement(By.xpath("//ul[@id='fileList']/li")).getText());
+
+        //Multiple file upload
+        String file1Path="C:\\Users\\003J72744\\Downloads\\Performance Test Plan V1.0.doc";
+        String file2path="C:\\Users\\003J72744\\Downloads\\ai-data-scientist.pdf";
+        WebElement multipleFileUplaod=driver.findElement(By.xpath("//input[@name='filesToUpload']"));
+        multipleFileUplaod.sendKeys(file1Path+"\n"+file2path);
+        System.out.println("File uploaded is: "+driver.findElement(By.xpath("//ul[@id='fileList']/li[2]")).getText());
+        System.out.println("File uploaded is: "+driver.findElement(By.xpath("//ul[@id='fileList']/li[1]")).getText());
+
+
+
+    }
+}
+
+
+OUTPUT:
+File uploaded is: ai-data-scientist.pdf
+File uploaded is: Performance Test Plan V1.0.doc
+
+************************************************************************************************************************************************
+Screenshot
+==========
+->Using TakeScreenshot interface and getScreenshotAs()
+->Output type is file and Return type is File
+
+To get current project directory
+System.getProperty("user.dir")
+
+
+Capture full page screenshot
+----------------------------
+Ex:
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+
+import java.io.File;
+import java.io.IOException;
+import java.time.Duration;
+
+import org.apache.commons.io.FileUtils;
+
+
+public class FullPageScreenshot  {
+    public static void main(String[] args) throws InterruptedException, IOException {
+        WebDriver driver = new ChromeDriver();
+        driver.manage().window().maximize();
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+        driver.get("https://demo.nopcommerce.com/");
+        
+        TakesScreenshot ts = (TakesScreenshot) driver;
+        File screenshot = ts.getScreenshotAs(OutputType.FILE);
+        File source = new File(System.getProperty("user.dir")+"\\src\\main\\screenshotssamples"+"\\error.png");
+        FileUtils.copyFile(screenshot, source);
+        
+        Thread.sleep(5000);
+        driver.quit();
+    }
+}
+
+
+Capture specific part of the web page/ any specific Web element
+--------------------------------------------------------------
+->Introduced in Selenium 4 
+
+Steps:
+->Identify the required web element or part of web page for which we need to take screenshot
+->Using the identified web element call getScreenshotAs() of TakeScrenshot interface
+
+
+Ex:
+package org.appu.seleniumbasics;
+
+import org.apache.commons.io.FileUtils;
+import org.openqa.selenium.*;
+import org.openqa.selenium.chrome.ChromeDriver;
+
+import java.io.File;
+import java.io.IOException;
+import java.time.Duration;
+
+public class ScreenshotOfSpecificPart {
+    public static void main(String[] args) throws InterruptedException, IOException {
+        WebDriver driver = new ChromeDriver();
+        driver.manage().window().maximize();
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+        driver.get("https://testautomationpractice.blogspot.com/");
+
+        WebElement partOfWebpage=driver.findElement(By.xpath("//label[text()='Days:']//parent::div"));
+        File screenshot = partOfWebpage.getScreenshotAs(OutputType.FILE);
+        File source = new File(System.getProperty("user.dir")+"\\src\\main\\screenshotssamples"+"\\error.png");
+        FileUtils.copyFile(screenshot, source);
+        
+        driver.quit();
+
+    }
+}
+************************************************************************************************************************************************
+Options Classes 
+===============
+->Used to configure browser setting
+->Classed used
+ChromeOptions
+EdgeOptions
+FirefoxOptions
+
+->All have same methods
+
+Headless browser
+----------------
+ChromeOptions options=new ChromeOptions();
+options.addArguments("--headless=new");
+WebDriver driver = new ChromeDriver(options);
+
+Pros: To run on remote machine, Allows multiple tasks, run faster
+Cons: Can take screenshot, difficult to debug
+
+SSL handling
+------------
+->Few web site its ask to accept ssl then we can proceed
+->To by pass such application we need to use this
+ChromeOptions options=new ChromeOptions();
+options.setAcceptInsecureCerts(true);
+WebDriver driver = new ChromeDriver(options);
+
+Disable Chrome being controlled by automation Notification
+----------------------------------
+options.setExperimentalOtion("excludeSwitches",new String[] {"enable-automation"});
+
+Run in Incognito mode
+---------------------
+options.addArguments("--incognito");
+
+Disable notifications/adds
+-------------------------
+// Disable notifications
+options.addArguments("--disable-notifications");
+
+// Block pop-ups and ads
+options.addArguments("--disable-popup-blocking");
+
+// Disable infobars (sometimes ads show as infobars)
+options.addArguments("disable-infobars");
+
+************************************************************************************************************************************************
+Handling Broken Links
+=====================
+->When we hit any url and we not get any response fro server and its status code is greater than 400 then that link is broken link
+ 
+Steps: Hit server with URL, Get its status code using href attribute , If its greater than or equal to 400 then it is broken link. 
+<a href="error-page.asp?e=410">Errorcode 410</a>
+
+Ex:
+package org.appu.seleniumbasics;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.time.Duration;
+import java.util.List;
+
+public class BrpkenLinks {
+    public static void main(String[] args) {
+        WebDriver driver = new ChromeDriver();
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+        driver.manage().window().maximize();
+
+        driver.get("http://www.deadlinkcity.com/");
+
+        List<WebElement> links = driver.findElements(By.tagName("a"));
+
+
+        int workingLink=0,brokenLink=0;
+
+
+        for (WebElement link : links) {
+            String hrefAttribute = link.getAttribute("href");
+            if (hrefAttribute == null || hrefAttribute.isEmpty()) {
+                System.out.println("Since href attribute value is not available cannot able to find the brken link");
+            } else {
+                try {
+                    URL url = new URL(hrefAttribute);
+                    HttpURLConnection uc = (HttpURLConnection) url.openConnection();
+                    uc.connect();
+
+                    if (uc.getResponseCode() >= 400) {
+                        System.out.println("Link is BROKEN");
+                        brokenLink++;
+                    } else {
+                        System.out.println("Link is WORKING");
+                        workingLink++;
+                    }
+                    //System.out.println("Protocol: " + url.getProtocol());
+                    //System.out.println("Host: " + url.getHost());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        System.out.println("Total number of links: " + links.size());
+        System.out.println("Total Working Links: "+workingLink);
+        System.out.println("Total Broken Links: "+brokenLink);
+
+        driver.quit();
+    }
+}
+
+
+OUTPUT:
+Link is WORKING
+Protocol: http
+Host: www.deadlinkcity.com
+
+Link is WORKING
+Protocol: http
+Host: www.deadlinkcity.com
+
+Link is BROKEN
+Protocol: http
+Host: www.deadlinkcity.com
+.....
+Total number of links: 48
+Total Working Links: 4
+Total Broken Links: 42
+

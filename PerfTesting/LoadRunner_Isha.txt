@@ -1,0 +1,2462 @@
+Load Runner Contents
+====================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*******************************************************************************************************************************************************
+
+->Non Functional testing
+========================
+	Performance testing
+
+->Bottleneck
+=============
+Defects are referred as Bottleneck in PT
+Cause for the deviation in the requirement.
+Ex: Login should take 2sec but its taking 6 sec. The reason for this slowness is the Bottleneck.
+
+*******************************************************************************************************************************************************
+->Why Perf testing
+==================
+To maintain quality of the Application , make sure application runs faster.
+As load[# users] increases on the AUT, Perf of the application may deteriorates.
+
+*******************************************************************************************************************************************************
+->NFR
+=======
+Non functional requirements to perform Perf Testing
+
+*******************************************************************************************************************************************************
+->What is Perf Testing
+=======================
+Concurrent users: # users using application at same point of time
+Applying load on AUT and check the behaviour of the application wrt response time.
+# users count will be given by client as part of NFR
+These users are called Vusers: Machine generated users
+
+*******************************************************************************************************************************************************
+->PT Tools
+==============
+Load Runner
+Performance center
+Jmeter
+NewLoad
+SilkPerformer
+Webload
+OATS
+
+*******************************************************************************************************************************************************
+->Types of Users
+=================
+User base: Total number of users who can access the Application
+Application Users/Concurrent Users: Total number of users using[transaction or think time] system at specific point of time. 
+Simultaneous users:  Total number of users performing same operation at specific point of time. 
+
+Ex:
+UB:100 Users
+CU:20 using login/10 using payment/10 Waiting/25 Searching the product = 70 users using the application 
+SU:25 Searching the product at same time 
+
+*******************************************************************************************************************************************************
+->Install Load Runner
+=====================
+Mercury came out Load runner from 1993 till 2016, now acquired by HP at 2004, Micro focus acquired from HP 
+Install Load runner
+ Vugen
+ Controller
+ Analysis
+
+*******************************************************************************************************************************************************
+Software Architecture
+=====================
+Hw+Sw
+To identify the reason for bottleneck, we need to aware of the architecture.
+
+Server
+------
+Processor+Memory[RAM]+Harddisk
+Software which understand and process the client request
+Place where our application is hosted
+
+Types
+------
+File server: Process request related to files 
+Database Server: Process request related to data
+Application Server[App server]: Process request related to the application. Ex: Need to login to FB, Need to delete post in twitter.
+
+Layers
+------
+Presentation layer[UI]
+Business layer[Backend]
+Data layer[DB]
+
+Architecture types
+------------------
+Desktop App: Thin client [2 Tier Arch/Client Server]
+Web App: Thick client [2 Tier Arch/Client Server]
+
+3 Tier Arch [UI Layer+ Business logic Layer[App Server]+Data Layer] All 3 in different machine
+
+Web Application N Tier Architecture:
+it can have any number of app servers
+Client<->Webserver<->App Server<->DB Server
+
+Transaction
+-------------
+Each request sent from Client to Server
+Any request sent to Server is known as transaction
+Note: UI level actions are not transaction, ex: entering UN is not transaction. Enter un,pw and Click on Login button , a request is sent to Server to perform login this is considered as Transaction
+Ex: Launch Page transaction, Login transaction, Logout Transaction
+
+Response Time or E to E Transaction response time
+-------------------------------------------------
+Time taken for the complete request to be processed by Server and sends back response to Client.
+Client---request->Server
+Server--response-->Client 
+
+->Internet: between client and server
+  Intranet: between web, app and db server
+
+->Request processing
+If App server takes more time to process the request then we may need to increase the count of App server. [Scale Up]
+Inc App/Web server/ DB server count: Scale up
+Dec App/Web server/ DB server count: Scale down
+
+Client/1 to N Web server/1 to N App server/1 to N DB server
+
+->Difference between Web server and App server
+Client send request to Web server, if the request is for static content then Web server responds to it, if request has business logic or any dynamic content then it sends to App server to process the request.
+
+Key Differences
+
+Purpose:
+Web Server: Primarily serves static content and handles HTTP requests.
+Application Server: Executes business logic and serves dynamic content, providing additional services for enterprise applications.
+Content Served:
+Web Server: Static content (HTML, CSS, images).
+Application Server: Dynamic content generated by server-side applications.
+
+Services Provided:
+Web Server: Basic request handling and load balancing.
+Application Server: Advanced services like transaction management, messaging, and middleware integration.
+
+Examples:
+Web Server: Apache HTTP Server, Nginx, IIS.
+Application Server: Apache Tomcat, JBoss (WildFly), IBM WebSphere, Oracle WebLogic.
+
+Conclusion
+While both web servers and application servers are crucial components of web infrastructure, they serve different purposes. A web server focuses on delivering static content quickly and efficiently, whereas an application server is designed to execute complex business logic and generate dynamic content. In many modern architectures, these roles can overlap, with servers like Apache Tomcat acting as both a web server and an application server.
+
+
+->Load balancing
+
+c1   L  WS1    AS1
+     O
+c2   A                       DB Server
+     D  WS2
+c3
+     B         AS2
+.    A
+.    L
+.    A  WS3
+     N
+     C
+     E
+     R
+LB checks which server is free and has less load and allocate request to that specific server to handles the request.
+
+->Three tier architecture
+
+Client<-->WebApp Servers[Tomcat, JBoss, Weblogic, Websphere, IS..]<-->DB Server
+
+->User load
+New App: Client specify
+Old App: Splunk logs
+
+->Host machine: Where WebApp server[Tomcat,JBoss,...] / DB server [Oracle, DB2,..]is installed.Both can be in single host machine or it can in different host machine.
+One HM has WebApp server and other HM has DB server.
+OS: Redhat Linux, Solaris, HP-UX,...
+
+->Performance tuning
+Client-internet time->WebApp Server--intranet time->DB Server
+                        5 sec to                      20 sec to 
+                    process request                process request
+                   |---------Response time--------------------|
+
+Time taken can be in WebApp server or Db server, need to check on these two if there is more response time
+
+Performance Tuning: Fixing bottle neck either in WebApp server or Db server or in whole system.
+
+->Protocol
+Set of rules to be followed by client to connect with server.
+http/https/ftp/smtp/,...
+
+->What is an PT
+Testing application for speed[quick response time under concurrent load ex 1000 users], stability[longer duration with same performance Ex:8hrs/70% max load], scalability[increasing the load/future load/50% increase in user load in next 1 year] in production like environment under vuser load to meet NFR
+
+->Definitions
+Throughput: # Transaction per seconds
+Response Time: Time taken by system to respond for a specific request [client <->Server], Taken by System.
+Think time: Waiting time between two transactions, 10 sec is the industry std think time, it will be different for different users. Taken by User.
+Transaction response time: Same as Response time [client <->Server]
+
+->PTLC: Performance testing Life Cycle
+NFR Gathering and Analysis 15 days
+ Test Lead or Manager collects the requirement from client and document it.
+ OP:NFR
+
+Test Strategy/Planning 15 days
+ Test Manager and Test Lead 15 days
+ Document to be prepared, reviewed and sign on.
+ OP: Test Plan
+
+Test Design and Development 1 month
+ Performance Test Specialist
+ Create Perf Test scripts
+ Multiple scripts will be created based on the critical scenarios
+ OP: Test Scripts
+
+Test Execution 15 days
+ OP: Test Results
+
+Test Result Analysis 15 days
+ Compare with benchmark result
+ Find if bottleneck exist and do analysis on the reason for the bottleneck 
+ Bottleneck can be in :Program written by Developer, WebApp Server, Processor, Memory, DB Server, Queries,....
+ Find issue exist, if yes where
+ After fixing, Re Execution wil happen
+ OP: Test Reports
+
+Bottleneck Analysis
+ If Bottle neck exists
+ Find if bottleneck exist and do analysis on the reason for the bottleneck 
+ Bottleneck can be in :Program written by Developer, WebApp Server, Processor, Memory, DB Server, Queries,....
+ Find issue exist, if yes where
+ After fixing, Re Execution will happen
+
+
+->When Perf Testing Start
+ SDLC Requirement Analysis phase itself PTLC will starts or Dev phase it will start
+
+->Types of Perf test
+Load-speed
+Stress
+Endurance/Soak-Stability
+Scalability-
+
+->NFR Gathering
+Prod and Perf test env infrastructure details of both hardware and software.[WebApp server details, DB server details, LB details[OS, RAM, Processor speed]
+
+Transaction details
+ Critical business scenarios/High load business scenarios/Frequently used scenarios
+ Ex: Ticket booking in IRTC
+
+Scalability related data
+
+Work load related data
+ Application usage pattern and volumes on business critical scenarios
+ Given by Client or Logs
+ Ex: login scenario/high volume/700 tph[transaction per hour]
+     open or close fd/business critical/30tph
+     Statement for last 5 years/High resource intensive/10tph
+
+Peak hour details for all the scenarios and tph to be achieved details
+
+Expected Response time in seconds details for all the transactions[SLA]
+Ex:
+simple trs 2 sec Ex: login, navigation from one to other screen etc
+medium trs 5 sec Ex: create account
+complex trs 8 sec Ex: retrieve 100 records
+
+Database related details, Sensitive related info,...[Masking to be done]
+
+*******************************************************************************************************************************************************
+Load Runner Suite
+=================
+Vugen [Virtual user generator]
+  Test script generation
+Controller
+  Test script execution
+Analysis
+  Test result analysis
+Agent[Load generator/Agent machine/Load injector]
+ Runs in background can able to see
+
+By default LoadRunner agent process .exe will be running in background process
+
+->Vugen [Virtual user generator]
+Used to create the Test script 
+Single user execution 
+Record and create the script
+Records the events between client and server on the network level[socket level] when an user perform any action with the server
+Load test in run for 1 hour to access the performance of the application. 
+
+->Controller
+Used to execute the script
+Simultaneous and Concurrent user execution 
+No of Scripts/No of Users to be executed is controlled by Controller
+Need to do Test run or dry run or shakeout test before running actual perf test to validate any env issue, data issue, LG issue, issue in script
+
+->Load runner Architecture
+
+Vugen:
+Creates two scripts and gives to Controller for WFM
+Check mail
+Compose mail
+
+Controller:
+Performs work force modeling based on client requirement and starts the execution.
+
+Scenario 1->
+            Group 1->Check mail   LG1  400 Users
+            Group ->Compose mail  LG2  600 Users
+
+LG/Load Injector/Agent machine
+In background LG/Load Injector/Agent machine downloads the scripts and start running these scripts on the AUT
+After running these scripts, LG will send result back to Controller, Controller now collates the result given by LG and send to Analysis for analysis.
+
+Analysis
+Client can start analyse the result given by Controller.
+
+Vugen[Script creation]->Controller[WFM]->LG[Execution]->Controller[Collate the result]->Analysis[Analyze the results]
+
+Note: 
+Same LG can execute many groups or different LG can be used to execute different group, based on capacity of LG
+One script have n number of transactions.
+One scenario will have 1 to N groups
+1 Groups will have one to N Scripts
+
+*******************************************************************************************************************************************************
+LR components installation
+==========================
+Vugen and Analysis will be installed in Perf tester machine
+Controller will be installed in separate machine M1
+LG will be installed in separate machine M2[LG1],M3[LG2],...
+Connection between Controller and LG should be made[M1 to M2,M3,..]
+
+Same Controller will be sued by multiple Tester working in the project by booking slots. PT1 9am to 10 am, PT2 10 to 11 am,..
+
+*******************************************************************************************************************************************************
+LG Machine calculation
+=======================
+Memory footprint, its depends on protocol
+
+Ex 1:
+Http protocol needs 2.3 mb of RAM for one user
+To run 1000 users we need how many LG ?
+If processor has 500mb memory 
+500/2.3=217 approx. user load we can run on single lg machine
+Approx 5 LG needed t run 1000 user load
+
+
+Ex 2: 
+Need to execute SAP protocol script
+SAP protocol [memory footprint] needs 10mb per user
+2gb memory / 3.2 g HZ processor
+To run 1200 users how many LG needed
+
+2*1024/10=/10=204 Approx
+To run 1200 users we need Approx 6 LG
+
+*******************************************************************************************************************************************************
+->LG connection to Controller
+=============================
+Through IP address we can able to connect LG to Controller
+Controller>Scenarios>Load generators>Click ADD>Add name>Add OS details>OK>Click on connect. It should be ready
+
+*******************************************************************************************************************************************************
+->Work Load modeling[WLM]
+=========================
+Find No Of Vusers/No of Iteration/Pacing to achieve required TPH
+
+Think time: Time gap between transaction
+Pacing: Time gap between Iterations
+
+One Scenario->1 to N Groups->Each groups can have 1 to N LG->Each LG handles 1 to N VUsers OR one LG can be assigned to multiple groups
+
+Script  LG            VUsers
+Create  LG1, LG2  400 Vusers
+Delete  LG3       100 Vusers
+
+A  LG1 100 Vusers
+B  LG1 100 Vusers
+C  LG1 100 Vusers
+
+Ex 1: WLM
+Scenario ->Launch Think Time Login Think Time Logout =>Launch Scripts
+Required
+6 transactions per hour ie 6 Login should happen in one hour/need to run for 1 hour 
+How many Vusers and how many iterations per Vusers required and how much Pacing required?
+
+Solution:
+Run for 1 VUsers and find how much time it takes to execute one scenario Ex: takes 10 min for exe of Login scenario
+
+Approach 1: 6 VUsers one iteration
+Approach 2: 1 VUsers 6 iteration
+Preferred Approach 2 since we need to reduce no of VUsers
+
+Ex 2: WLM
+Scenario ->Launch Think Time Login Think Time Logout =>Launch Scripts
+Required
+3 transactions per hour ie 3 Login should happen in one hour/need to run for 1 hour 
+How many Vusers and how many iterations per Vusers required and how much Pacing required?
+
+Solution:
+Run for 1 VUsers and find how much time it takes to execute one scenario Ex: takes 10 min for exe of Login scenario
+
+Approach 1: 3 VUsers one iteration and idle for 30 min
+Approach 2: 1 VUsers 3 iteration 10 min idle between each iteration[Pacing=10min]
+Preferred Approach 2 since we need to reduce no of VUsers
+
+Ex 3: WLM
+Scenario ->Launch Think Time Login Think Time Logout =>Launch Scripts
+Required
+12 transactions per hour ie 12 Login should happen in one hour/need to run for 1 hour 
+How many Vusers and how many iterations per Vusers required and how much Pacing required?
+
+Solution:
+Run for 1 VUsers and find how much time it takes to execute one scenario Ex: takes 10 min for exe of Login scenario
+
+Approach 1: 2 VUsers each executing 6 iteration without any pacing total 12 TPH [Pacing=0min]
+
+Ex 4: WLM
+Scenario ->Launch Think Time Login Think Time Logout =>Launch Scripts
+
+Required
+6 transactions per hour with 2 Concurrent users 
+How many Vusers and how many iterations per Vusers and how much Pacing required?
+
+Solution:
+Run for 1 VUsers and find how much time it takes to execute one scenario Ex: takes 10 min for exe of Login scenario
+
+Approach:
+2 VUsers 3 Iterations 10 min pacing 
+
+U1  It1 10 min Pacing It2 10 min Pacing  It3 10 min Pacing 
+U2  It1 10 min Pacing It2 10 min Pacing  It3 10 min Pacing
+
+Ex 5:
+1025 Login TPH 298 Concurrent Users
+
+Solution:
+Run for 1 VUsers and find how much time it takes to execute one scenario Ex: takes 10 min for exe of Login scenario
+
+Little Formula
+
+N=X * (Rt)
+N:No of Concurrent Users
+X:Throughput per Second[Transactions per second]
+Rt: Response time per second
+
+N=X *(Rt+Zt)(For system with think time)
+
+Zt: Think time
+Industry standard Think time Zt is 10 sec
+
+Rt+Zt =Script Execution Time
+Time taken to execute a script for one user along with think time
+Ex: Login Scenario ->Launch Think Time Login Think Time Logout =>Launch Scripts
+
+N= TPS * (Time taken to execute script for one user along with think time + pacing)
+N= X * (SET +Pacing)
+
+
+Ex:
+600 Concurrent users
+
+Login Scenario
+TPH 700
+
+Account Summary
+TPH 1000
+
+Check Transactions
+TPH 800
+
+Open FD
+TPH 30
+
+Statements
+TPH 10
+
+Solution:
+
+Step 1: Calculate X in Sec
+
+X=TPS=TPH/360=700/3600=0.194444
+X=0.194444
+
+
+Step 2: Calculate N for each Scenario
+
+N=600[Given]
+
+Sum of all TPH=700+1000+800+30+10=2540
+
+Login Scenario: 700/2540*600=165
+Account Summary: 1000/2540*600=237
+Check Transactions: 800/2540*600=189
+Open FD: 30/2540*600=7
+Statements: 10/2540*600=2
+-------------------------
+Total: 600 
+
+Step 3: Get SET in seconds
+
+Create script and run for one user in Seconds
+
+Login Scenario: 180 sec
+Account Summary: 300 sec
+Check Transactions:  300 sec
+Open FD:  240 sec
+Statements: 180 sec
+
+Step 4: Calculate Pacing for each scenario
+
+Second checkbox of RTS
+Pacing=N/X-SET
+
+Pacing for Login Scenario: 165/0.194444-180=668 Sec
+Pacing for Account Summary: 237/0.194444-300=553 Sec
+Pacing for Check Transactions: 189/0.194444-300=550 Sec
+Pacing for Open FD:  7/0.194444-240=600 Sec
+Pacing for Statements: 2/0.194444-180=540 Sec
+
+Third checkbox of RTS
+Pacing=N/X
+
+Pacing for Login Scenario: 165/0.194444=668 Sec
+Pacing for Account Summary: 237/0.194444=553 Sec
+Pacing for Check Transactions: 189/0.194444=550 Sec
+Pacing for Open FD:  7/0.194444=600 Sec
+Pacing for Statements: 2/0.194444=540 Sec
+
+Step 5:
+Go to Run time setting , click on pacing, Select second check box  and then apply there
+
+OR 
+N/X
+Go to Run time setting , click on pacing, Select third check box  and then apply there
+
+*******************************************************************************************************************************************************
+->VUGEN
+=======
+Steps to create script
+ Understand AUT
+ Record the Transactions
+ Enhance the Script
+ Playback to make sure there is no issues in the script
+
+http://localhost:1080/WebTours/
+
+Vuser_init
+Action
+Vuser_end
+
+*******************************************************************************************************************************************************
+RTS: Run Time Setting
+=====================
+->Order of action execution depends on RTS action sequence.
+->Sequence of execution setup
+->No of Iteration Setup
+->Block creation
+
+Creating block
+--------------
+->Click on Insert block>Click on Insert required actions>Set no of Iterations for the block>Execute
+
+*******************************************************************************************************************************************************
+->Script Creation/Recording
+===========================
+Step 1
+------
+Setup for recording:
+
+In recording option
+ Click on record>Recording options link
+
+setup 1:General->Recording>HTTP based scripts->HTML Advance>Select second option in both 
+
+setup 2:HTTP Properties>Advance>Disable Replace pass with enc parameters
+
+setup 3: Mapping and Filtering>Select Socket level data dropdown
+
+Adding Headers
+->In recording option we can add all required Headers before recording the script. OR after recording we can add required Headers and Regenerate the scripts.
+
+Step 2
+------
+Start recording by adding comments into respective transactions
+
+Step 3
+------
+Setup for execution:
+
+setup 1: Tools>Options>Replay>Enable Show run time viewer
+  To see execution while executing the script
+
+setup 2: In RTS
+Log>Enable Extended log
+    Enable Data returned by Server[Server Response][If more debugging needed]
+
+setup 3:Tools>Scripting>Replay>Enable show runtime viewer
+
+Step 4
+------
+Execute/Run/Playback
+Step by Step OR
+Continuous
+
+RTS-Logs-Extended Logs
+ Enable Parameter Substitution option and also Enable Data returned by Server if there is any issue in the script
+
+Response can be viewed in:
+ Snapshot view : To see request and response as form of http or ui
+ Output console : To see logs
+ Runtime viewer : To see execution 
+
+Data returned by server should be enable for debugging the script.
+
+*******************************************************************************************************************************************************
+Main Request we see response from Server while executing the script[Main Web Requests]
+web_url() -GET Request
+web_submit_data() - POST Request
+web_submit_form() -POST request
+
+
+web_custom_request()
+web_link()
+
+->One action can contains N transaction
+
+*******************************************************************************************************************************************************
+->C and LR Programming Language
+========================
+Ctrl+Space for short cut
+
+return 0 Action exe successfully
+return -1 Action exe failed
+
+//to print any data
+lr_output_message("Any Data");
+
+//To start and end transaction
+lr_start_transaction("Transaction name");
+lr_end_transaction("Transaction name", LR_AUTO);
+
+//If there are two web request need to be sent at once to the server then both request should be wrapped inside concurrent start and end
+web_concurrent_start(NULL)
+web_concurrent_end(NULL)
+
+//To add sub transaction under parent transaction
+lr_start_sub_transaction("sub transaction name", "parent transaction name");
+lr_end_end_transaction("sub transaction name", LR_AUTO);
+Note: Sub transaction name can provide resource name
+      If one transaction has one main web request and multiple child web request then we can add transaction and sub trnasaction so we get result at sub trnasaction level to analyze the results
+
+//To add text checkpoint
+web_reg_find("Search=Body","Text=Welcome to the Web Tours site", LAST); 
+
+*******************************************************************************************************************************************************
+Protocol Advisor
+================
+Used to analyze the protocol used in the AUT
+
+*******************************************************************************************************************************************************
+Script creation
+===============
+Step 1: Create the script.
+
+Step 2: Add start and end transaction for each transaction or actions.
+
+lr_start_transaction("Launch");
+lr_end_transaction("Launch", LR_AUTO);
+
+Step 3: Compile the script and make sure there are no syntax errors
+
+Step 4: 
+
+
+************************************************************************************************************************************************
+Test Plan
+=========
+1. Introduction
+	Project background
+	Document purpose
+	Test Objective
+	Document audience
+2. Risk Identification and Contingencies
+	Assumptions
+	Constraints
+	Dependencies
+	Risks
+3. Test scope
+	In Scope items: Test cases 
+        Types of PT: Shakedown, Load, Stress, Endurance, Volume, Scalability Test,..
+	Performance monitoring
+	Workload modeling
+	Out of scope
+	Featured to be tested
+	Load scenarios	
+	Test Deliverables: Test plan, Test scripts, Test scenario, Test Results, Test Status reports and Completion reports.
+4. Detailed Test approach
+	Test Phase management
+Load test->Identify bottlenecks, Fix it->Do one more Load test
+Once it stable achieved then do Stress, Soak, Volume testing is performed.
+
+When to do: System testing [No bugs]->System Integration testing->Performance / Security testing
+
+5. Test schedule and Milestones
+    Milestones: Activity with start and end dates, Who is responsible for the activity.
+	Test plan: Prepare, Walkthrough and Signoff
+	Test environment: Prepare env, Code deployment and do Shakeout testing.
+	Test data: Test data setup.
+	Test scripts: Prepare Test scripts for all identified test scenarios.
+	Test execution: Using URL. Shakedown testing[To verify script working fine, env issue], Load testing[Multiple cycles], Soak testing, Stress testing, Scalability testing.
+
+All are done in parallel.
+
+6. Roles and Responsibilities
+	Vendor
+	Test team
+
+7. Test Environment
+	Hardware, Software, Servers, ...
+	Test Tools
+
+9. Test entry and Exit Criteria
+	When to start executing PT: Test plan, WFM approved, Test execution scheduled agreed, Test acceptance criteria agreed, System testing/ Integration testing is passed, All functionality Load test has to be performed is working and confirmed by application team, Script ready.
+	When to stop PT: All scenarios have been executed, Report prepared, Results are available,...
+	Progress tracking and Reporting: Kickoff meeting[TP walkthrough], Checkpoints [Script creation walkthrough], Status[Daily, Weekly, ...status sharing and discussing], Perf exit.
+************************************************************************************************************************************************
+Logs
+----
+->In RTS, Extended Log: Data returned by server and Parameter substitutions.
+
+Issues
+------
+->Script issue, can be checked by Compiling.
+->Issue from Server, can be checked by Data returned by server and Parameter substitutions and snapshot view.
+
+Replay script with and without Think Time
+------------------------------------
+->Go to RTS, Think time and Ignore Think time.
+
+Note: Think time should be out side the transaction not as part of Transaction. Add TT before 
+lr_start_transaction("Launch");
+
+Valid: 
+Thinktime(10)
+lr_start_transaction("Launch");
+
+Invalid: lr_start_transaction("Launch");
+Thinktime(10)
+
+Wasted time: Time taken by Vugen to generate Logs
+In Controller, Response time will not include wasted time but in Vugen it will be included.
+
+Preferred think time while playing script
+-----------------------------------------
+->Go to RTS, Think time: Use random 50 to 100  % should be in General think time setting.[PREFFERED]
+
+Transaction Naming standards
+----------------------------
+->projectname_scriptname_transactionnumber_transactionname
+
+Ex: QABank_MySecondScrit_T02_Launch
+
+Executing one user multiple iteration
+-------------------------------------
+Go to RTS->Run login->Select no of iteration
+
+************************************************************************************************************************************************
+Recording Settings
+==================
+
+Step 1: Initial Setups before recording
+---------------------------------------
+In recording option
+ Click on record>Recording options link
+
+setup 1:General>Recording>HTML Advance>Select second and second option in both 
+setup 2:HTTP Properties>Advance>Disable Replace pass with enc parameters checkbox if selected
+setup 3:Mapping and Filtering>Select Socket level data dropdown
+setup 4:Add required Headers if needed
+HTTP Properties>Headers
+->In recording option we can add all required Headers before recording the script OR after recording we can add required Headers and Regenerate the scripts.
+
+Step 2: Record by adding comments, start and end transactions
+-------------------------------------------------------------
+
+Step 3: Remove un necessary domain in Replay Summary tab and regenerate the script
+----------------------------------------------------------------------------------
+
+Step 4: Remove Think time from inside to outside the transaction
+----------------------------------------------------------------
+
+Step 5: Setups for execution in RTS
+-----------------------------------
+setup 1: Tools>Scripting>Replay>Enable show runtime viewer[Optional]
+  To see execution while executing the script
+
+setup 2: In RTS
+Log>Enable Extended log[Optional]
+    Enable Parameter Substitution option and also Enable Data returned by Server if there is any issue in the script
+
+setup 3: setup Think time for 50 to 100%
+
+Response can be viewed in:
+ Snapshot view : To see request and response as form of http or ui
+ Output console : To see logs
+ Runtime viewer : To see execution 
+
+************************************************************************************************************************************************
+Running script same as browser
+------------------------------
+->In RTS->Browser emulation ->Select required browser and versions
+
+Comments
+--------
+//
+/*
+
+
+*/
+
+HTML based VS URL based script 
+------------------------------
+->No of web requests in URL based script will be more compare to HTML based script.
+->Both are same, RT will be same, both will have same no of web resources.
+->URL based script has both main and also other request like js, png,... but HTML based scripts has only main requests.
+->On each resource we can capture response time by using URL based scripts.
+
+One Web request will be splitted into no of web request/web resources so URl based script will have more no of web requests
+Ex: launch
+index.htm, headers.htm, ..png,.... [Web resources]
+
+Preferred: HTML based
+
+Ex: Launch transaction
+URL based script:
+web request 1 -> Web resource 1 5 sec
+web request 2 -> Web resource 2 5 sec
+web request 3 -> Web resource 3 3 sec
+web request 4 -> Web resource 4 15 sec
+
+HTML based script
+web request 1 -> Web resource 1 5 sec
+web request 2 -> Web resource 2,3 and 4  23 sec
+
+->No of request will be different but no of web resource will be same
+->In HTML based script web request 2 taking 23 seconds, but internally the issue is with web resource 4 so we cant able to identify it , but we we go with URL based script then we can able to identify the issue web resource 4
+->While debugging to find exact web resource taking more time we need to go with URL based script else we can go with HTML based script.
+
+************************************************************************************************************************************************
+HTTP Watch
+----------
+->to see all resources in IE need to install HTTP watch
+
+Interview Question
+------------------
+Which is HTTP versions
+->HTTP1.1/HTTP2.0
+
+What is referrer in the web request
+->Specify the origin of the request
+->From which request it came to this request.
+->It can be previous main request or previous some sub web request. 
+Ex: policybazar.com came from google.com
+
+One action can have N transaction, Each transaction can have N sub transaction and N web request
+
+Each web request will have internally multiple sub web request/web resource
+Each sub web request/web resource will have separate request and response
+
+Action
+  Transaction1
+	WR1 
+	  Sub WR1
+	  Sub WR2
+	WR2
+	  Sub WR1
+	  Sub WR2
+	  Sub WR3
+
+  Transaction2
+	WR3
+	  Sub WR1
+	  Sub WR2
+	WR4
+	  Sub WR1
+	  Sub WR2
+************************************************************************************************************************************************
+Check points
+============
+->Text/Image Checkpoints
+
+Text checkpoint
+---------------
+->Checks for text in response [HTML response]
+->Each Web request we can put any number of text checkpoints
+->Always put at least one text check point for each transaction
+->Not put after end of the transaction
+
+->How to Add:
+After recording
+While recording
+From recording option
+
+->Where to Add:
+Can be applied 
+  Before start transaction/After start above all web request/After start above each web request
+
+Can be added in following positions
+Text Checkpoint
+T1
+{
+Text Checkpoint
+WR1
+Text Checkpoint
+WR2
+}
+
+Text Checkpoint
+T2
+{
+Text Checkpoint
+WR1
+Text Checkpoint
+WR2
+Text Checkpoint
+WR3
+}
+
+->After recording
+ Click on required web request, go to snapshot view, select recording, Select page view, select required text and right click and add text checkpoints.
+
+Syntax: 
+web_reg_find("Search=Body","Text=Welcome to the Web Tours site", LAST); 
+OR
+web_reg_find("Text=Welcome to the Web Tours site",LAST);
+OR
+web_reg_find("Search=Body","SaveCount=variableName","Text=Welcome to the Web Tours site", LAST);
+// variableName in LR Param contains how many times the text appears
+
+->From recording option
+ Click on Recording option, Click on HTTP properties, Click on Advanced, Enable "Generate web req find for page titles" , "sub frames"
+
+->While recording
+ While recording, in pop up click on insert check point option by selecting required text.
+
+->By default if any checkpoint failed then further execution will be stopped
+
+->Search will happen in
+SOAP: In XML
+Rest: In JSON
+Webapplication: In HTML response of all sub request or web resources
+
+web_reg_find("Search=Body","Text=Welcome to the Web Tours site", LAST); 
+
+web_reg_find("Search=Body","Text/IC=Welcome to the Web Tours site", LAST); 
+
+Image check point
+------------------
+->Search for src or alt attribute
+->Added after all the web request and before the end transaction
+
+Steps: Add check command
+       Go to RTS, go to preference, go to checks and enable it
+
+Syntax:
+web_image_check("hp_logo_check",
+		"Src=images/webtours.png",
+		"Alt=images/hp_logo.png",
+		LAST);
+
+************************************************************************************************************************************************
+Rendenzvous point
+===============
+->Point where all the vusers complete the execution of the transaction and meets till all ramp up users comes
+-> Need to add at Vuser script, but all setting will be done in Controller
+
+launc->TT->Rendenzvous point->Login
+User 1
+User 2
+User 3
+User 4
+
+After all 4 users complete Launch+TT then Login will starts , the point where all 4 users complete Launch+TT is known as Rend point
+
+Syntax:
+lr_rendezvous("Any name");
+
+->To be added before any other transaction starts
+->At this point all ramp up users meets and continue with next transaction
+
+->Ex Scenario: 100 users executing script but login has to be executed 70 users at a time
+Create rend point before login and do setting from controller for 70 users.
+
+************************************************************************************************************************************************
+C Programming Language
+======================
+
+Variables and Data types
+------------------------
+->integer, string, char, float, 
+->declaration will be done at compilation, initialization will be done wile running
+->During execution in watch section u can able to see values of a variables
+->Default value for integer is 0
+->declare at beginning and use anywhere or both declare and initialize at once or declare in globals.h and use in any actions
+->Meaning full and camel case for variable name
+ Ex: johnCena
+->Always store variables declaration in globals.h file
+If we declare variable in globals, they can be used across all the actions in the script. If declared in Action then its allowed to use only inside that action.
+
+
+int i; //declare
+i=10; //use
+
+int a=10,b=20,c;
+
+int a=10;
+float f=1.23;
+char s[]="appu";
+char *s="appu"; [PREFFERED]
+char c='a';
+
+int %d float %f string %s char %c
+%.2f : two decimal number
+
+//To print data o console
+lr_output_message("%d",integer variablename);
+
+
+Ex: Data types and variables with format specifiers
+int a=10,b=20,result;
+result=a+b;
+lr_output_message("Result of %d and %d is: %d",a,b,result);
+
+Variable Scope
+---------------
+Local: declared inside action
+Global: inside globals.h file
+
+Conditional statements and Operator
+-----------------------------------
+> < >= <= ==
+
+if(condition) {}
+else {}
+
+Ex:
+if(result==30)
+{
+lr_output_message("PASS");
+}
+else
+{
+lr_output_message("FAIL");
+}
+
+
+IQ: There are 10 actions, need to execute only 3
+->Sol 1: Go to RTS, remove all not needed actions.
+->Sol 2: Create one main action and call required action inside main action
+actionname(); In RTS run only main action.
+
+C Functions
+-----------
+strcmp(): String compare, used to compare two strings.
+ 
+int result=strcmp("appu","Appu");
+
+result=0 both are same
+result>0 string 1 greater than string 2
+result<0 string 1 less than string 2
+
+Ex:
+char *s1="appu";
+char s2[]="appu";
+int result;
+result=strcmp(s1,s2);
+lr_output_message("Result is: %d",result);
+
+OUTPUT:
+Result is: 0
+
+strstr(): Check is string 2 is subset of string 1
+strstr(string1,string2)
+
+Ex: 
+s1="this is appu from bangalore";
+s2="this is appu";
+int result=strstr(s1,s2);
+if result is 0 then s2 is not subset of s2 else s2 is subset of s1
+
+ 
+LR Parameter
+------------
+->LR variable which can store any type of data can be used in web request directly.
+->C variable value can be inserted into LRParameter/LRParameter value can be inserted into C variable
+->If we need to provide any C variable value to web request then it has to be converted into LRParameter. 
+->No prior declaration is required for LRParameter
+->To see value during execution need to see in Runtime data
+->To see in output, enable Parameterization under Logs in RTS
+
+Conversions:
+lr_param_sprintf("lr parameter var name","%f",c float variable name,);
+string C var=lr_eval_string("{LR Parameter var name}");
+int a=atoi(lr_eval_string("{age}"));
+
+
+C to LR conversion
+------------------
+Syntax:
+lr_save_int(c int variable name,"lr parameter var name");
+lr_save_string(c string variable name,"lr parameter var name");
+lr_param_sprintf("lr parameter var name","%f",c float variable name); [PREFFERED]
+
+Ex:
+int c=10;
+lr_save_int(c,"age");
+//Now age can be used directly in any web request
+
+char c[]="appu";
+lr_param_sprint(c,"uName");
+
+float f=1.23;
+lr_param_sprint("pival","%f",f);
+
+Ex:
+int a=100;
+float b=1.25;
+char *c="Aquaman";
+lr_param_sprintf("moviedetails","%s",c);
+
+Ex: Combination of float, int and string to LR Parameter
+int a=100;
+float b=1.25;
+char *c="Aquaman";
+lr_param_sprintf("moviedetails","%d tickets for %s movie each ticket costs %.2f",a,c,b);
+
+OUTPUT: 
+ConversionLRParameter.c(7): Notify: Saving Parameter "moviedetails = 100 tickets for Aquaman movie each ticket costs 1.25".
+
+
+Note:
+watch: c variable value during runtime
+runtime data: lr parameter value during execution
+output: c[lr_output_message()] and lr parameter value[parameter substitution]
+
+
+Creating LR Parameter
+---------------------
+->Click on Parameter, Click on new, Provide name and value
+
+LR to C conversion
+------------------
+->LR Param to C conversion
+->If we want to perform any arithmetic operation then we cant able to do directly on LR Param, it has to be converted to C 
+->Output data will be of type string
+->To convert to specific type use atoi()
+
+Syntax:
+string C var=lr_eval_string("{LR Parameter var name}");
+
+Ex:
+char *str;
+str=lr_eval_string("{LR_param}");
+lr_output_message("C value is %s ",str); 
+
+Ex:
+str2=lr_eval_string("{LR_param} is new value");
+
+Ex:
+lrparam1="appu";
+lrparam2="good boy";
+string res="appu is good boy";
+
+char *s=lr_eval_string("{lrparam1} is {lrparam2}");
+
+atoi()
+------
+Ex: Converting LR param to C int variable
+char *c;
+c=lr_eval_string("{age}");
+lr_output_message("AGE is: %s",c);
+lr_output_message("AGE is: %d",c+10); //ERROR
+
+Output is of type string
+
+int a;
+a=atoi(lr_eval_string("{age}"));
+lr_output_message("AGE is: %d",a);
+lr_output_message("AGE is: %d",a+10);
+
+Output is of type integer
+
+Ex: Integer C to String C using itoa()
+int a=10;
+char c[100]; //should be declared as array not pointer
+itoa(a,c,10);  //c contains string value of 10
+10: base 10
+
+
+
+sprint():
+->Used to convert c integer value to c string value
+Ex 1:
+int a=10;
+char c[100]; //should be declared as array not pointer
+sprint(c,"%d",a); //c contains string value of 10
+
+Ex 2:
+int a=10;
+int b=2.5;
+char c[100]; //should be declared as array not pointer
+sprint(c,"%d %f",a,b); //c contains string value of 10 2.5
+
+Realtime usage of Conversion
+---------------------------
+Ex:
+Action()
+{
+
+	web_reg_find("Search=Body",
+	"SaveCount=welcomeMessage",
+	"Text/IC=welcome",
+	LAST);
+	
+	lr_start_transaction("Launch");
+	
+	web_add_auto_header("Accept-Language", 
+		"en-US,en;q=0.5");
+
+	web_url("WebTours", 
+		"URL=http://127.0.0.1:1080/WebTours/", 
+		"TargetFrame=", 
+		"Resource=0", 
+		"RecContentType=text/html", 
+		"Referer=", 
+		"Snapshot=t1.inf", 
+		"Mode=HTML", 
+		LAST);
+	
+	count=atoi(lr_eval_string("{welcomeMessage"));
+
+	if(count>=1)
+	{
+		lr_end_transaction("Launch",LR_PASS);
+	}
+	else
+	{
+		lr_end_transaction("Launch",LR_FAIL);
+	}
+	
+}
+
+NOTE: Which ever data u store in LR Param, return type of LR Param is string type
+
+************************************************************************************************************************************************
+Error Handling
+==============
+3 ways we can handle error
+
+Automatic by Vugen based on Checkpoint provided
+-----------------------------------------------
+Ex:
+Action()
+{
+
+	web_reg_find("Search=Body"
+	"Text/IC=welcome",
+	LAST);
+	
+	lr_start_transaction("Launch");
+
+	web_url("WebTours", 
+		"URL=http://127.0.0.1:1080/WebTours/", 
+		"TargetFrame=", 
+		"Resource=0", 
+		"RecContentType=text/html", 
+		"Referer=", 
+		"Snapshot=t1.inf", 
+		"Mode=HTML", 
+		LAST);
+
+	lr_end_transaction("Launch",LR_AUTO);
+}
+
+Steps:
+Need to add text checkpoint at beginning of the start transaction
+After executing the request, LR will check the response returned by server for the text provided in text check point
+If it found atleast one time then LR_AUTO will make that transaction as PASS, else FAIL
+
+Using step count LR param
+-------------------------
+Ex:
+Action()
+{
+
+	web_reg_find("Search=Body",
+	"SaveCount=welcomeMessage",
+	"Text/IC=welcome",
+	LAST);
+	
+	lr_start_transaction("Launch");
+
+	web_url("WebTours", 
+		"URL=http://127.0.0.1:1080/WebTours/", 
+		"TargetFrame=", 
+		"Resource=0", 
+		"RecContentType=text/html", 
+		"Referer=", 
+		"Snapshot=t1.inf", 
+		"Mode=HTML", 
+		LAST);
+	
+	count=atoi(lr_eval_string("{welcomeMessage"));
+
+	if(count>=1)
+	{
+		lr_end_transaction("Launch",LR_PASS);
+	}
+	else
+	{
+		lr_end_transaction("Launch",LR_FAIL);
+	}
+	
+}
+
+Steps:
+Need to add text checkpoint at beginning of the start transaction with save count parameter
+After executing the request, LR will check the response returned by server for the text provided in text check point
+LR Save count parameter will store no of time the text exist in the response as string data
+Now we need to convert string LR param to int c var and put condition and make the transaction as PASS or FAIL
+
+int web_get_int_property(Http Property Type)
+--------------------------------------------
+->Based on http property returned for the transaction, we can pass or fail transaction.
+
+Ex:
+Action()
+{
+
+	web_reg_find("Search=Body",
+	"SaveCount=welcomeMessage",
+	"Text/IC=welcome",
+	LAST);
+	
+	lr_start_transaction("Launch");
+
+	web_url("WebTours", 
+		"URL=http://127.0.0.1:1080/WebTours/", 
+		"TargetFrame=", 
+		"Resource=0", 
+		"RecContentType=text/html", 
+		"Referer=", 
+		"Snapshot=t1.inf", 
+		"Mode=HTML", 
+		LAST);
+
+	sresult=web_get_int_property(HTTP_INFO_RETURN_CODE);
+	
+	if(sresult==200)
+	{
+		lr_end_transaction("Launch",LR_PASS);
+	}
+	else
+	{
+		lr_end_transaction("Launch",LR_FAIL);
+	}
+	
+}
+
+Ex: File download validation
+Action()
+{
+	
+	lr_start_transaction("Download");
+	
+    web_url("File dowload request",
+    "URL=http://speedtest.tele2.net/1MB.zip",
+    "Resource=0",
+    "RecContentType=text/html",
+    "Snapshot=t1.inf",
+    "Mode=HTML",
+    LAST );
+	
+	size=web_get_int_property(HTTP_INFO_DOWNLOAD_SIZE);
+	
+	lr_output_message("Downloaded file size is: %d",size);
+	
+	if(size>10000)
+	{
+		lr_end_transaction("Download",LR_PASS);
+	}
+	else
+	{
+		lr_end_transaction("Download",LR_FAIL);
+	}
+	
+	return 0;
+}
+
+************************************************************************************************************************************************
+Parameterization
+================
+Steps
+->Create dat file and store all the data in rows and columns
+->Create LR Param variable from Parameter section and specify the dat file location from where data to be taken
+->Assign from which column[number or name] the data should be taken
+->Replace constant value in script with LR Param variable  {LRParamName}
+->Column name in dat file and lr param name may not be same, in script we need to use lr param name not column name
+
+dat file
+UserName,Password
+appu,appu
+jojo,bean
+
+LR Param
+pUserName
+pPassword
+
+Ex:
+Login()
+{
+	lr_start_transaction("Login");
+
+	web_submit_data("login.pl", 
+		"Action=http://127.0.0.1:1080/cgi-bin/login.pl", 
+		"Method=POST", 
+		"TargetFrame=", 
+		"RecContentType=text/html", 
+		"Referer=http://127.0.0.1:1080/cgi-bin/nav.pl?in=home", 
+		"Snapshot=t3.inf", 
+		"Mode=HTML", 
+		ITEMDATA, 
+		"Name=userSession", "Value=139725.016605913HViHVAfpftVzzzzHtDVccpzDDcf", ENDITEM, 
+		"Name=username", "Value={pUserName}", ENDITEM, 
+		"Name=password", "Value={pPassword}", ENDITEM, 
+		"Name=login.x", "Value=51", ENDITEM, 
+		"Name=login.y", "Value=12", ENDITEM, 
+		"Name=JSFormSubmit", "Value=off", ENDITEM, 
+		LAST);
+
+	lr_end_transaction("Login",LR_AUTO);
+}
+
+Data scrubbing
+-------------
+->Identifying bad test data and deleting it
+->Ex: out of 500 un and pw few may be invalid , to identify it we need to do data scrubbing
+->Run for one user with 500 iteration making parameter sub logs as on and identify for which all data transaction is failing and remove it
+->To do this we need to select, 
+one user
+500 iteration
+Select next row: Sequential in Parameter tab
+
+Select next row 
+---------------
+->Sequential:
+Separate copy of dat file will be created for each user
+Sequential data for each iteration
+Duplicate in iteration can happen
+
+UserName,Password
+appu,appu
+jojo,bean
+kumar,gupta
+
+4 User 3 Iteration
+
+    I1   I2   I3
+U1 appu jojo  kumar
+U2 appu jojo  kumar
+U3 appu jojo  kumar
+U4 appu jojo  kumar
+
+->Random [PREFFERED]
+One file given to all, they pick randomly for each iteration
+Duplicate data across user or iteration can happen
+random across user or iteration
+
+4 User 3 Iteration
+
+    I1   I2   I3
+U1 appu jojo  kumar
+U2 appu kumar kumar
+U3 Jojo jojo  appu
+U4 kumar kumar kumar
+
+->Unique
+One copy given to all, pick random but no duplicate across users, If one user use the data then it cant be used by other user
+No two users have same data 
+We can abort, if there is no unique or use last value or cyclic manner for same user with same iteration by using "when out of value" option
+Between iteration duplicate can happen based on "when out of value" option, but between user cant be duplicate
+when out of value: abort/cyclic manner/last value use
+
+4 User 3 Iteration
+
+    I1   I2   I3
+U1 appu jojo  kumar
+U2 
+U3 
+U4 
+
+Since all 3 data used by User 1, no other get unique data
+
+4 User 2 Iteration
+
+    I1   I2   
+U1 appu  jojo  
+U2 kumar kumar
+U3 
+U4 
+
+appu jojo used by user 1 so cant used by user 2, 3 or 4
+
+Need to get value for all users uniquely:
+Allocate N values for each user so within the iteration they can re use only those allocated values so all user get values. 
+
+
+Possible combination:
+random / once : each user get one unique value randomly 
+                duplicate across iteration but not across users
+
+Note: One script any number of dat/csv file can be maintained
+
+************************************************************************************************************************************************
+Correlation
+===========
+Steps:
+Create LR parameter
+Identifying dynamic value in response
+Fetch value from response[lb/rb]
+Store it into LR parameter
+  web_reg_save_param_ex()
+Send value stored in LR parameter in next required request
+
+web_reg_save_param_ex()
+
+Left and Right boundary
+-----------------------
+LB and RB should be static
+
+Type of Correlation
+-------------------
+->Automatic
+->Manual 
+
+Automatic Correlation
+---------------------
+Steps:
+Select the value to be correlated
+Right click on Correlation selection
+Design Studio will be opened
+Provide required LR param name in Correlation parameter column
+Click on Correlate button
+
+OR
+Select Design studio
+DS shows all dynamic values
+Provide required LR param name in Correlation parameter column
+Click on Correlate button
+
+Automatic correlation will be done by creating below function
+/*Correlation comment - Do not change!  Original value='139731.763710004HViHtfcpfQfiDDDDtDVctpHVffHf' Name ='userSession' Type ='Manual'*/
+	web_reg_save_param_attrib(
+		"ParamName=userSession",
+		"TagName=input",
+		"Extract=value",
+		"Name=userSession",
+		"Type=hidden",
+		SEARCH_FILTERS,
+		"IgnoreRedirections=No",
+		"RequestUrl=*/nav.pl*",
+		LAST);
+
+Note: In recording option, configuration, API used for correlation, we can select which option to be used by DS to do correlation
+
+
+Manual Correlation
+------------------
+->Using web_reg_save_param_ex() function with LB and RB
+->Add function before the request only else not work
+->If LB or RB mentioned is wrong then request will fail
+
+Syntax:
+web_reg_save_param_ex(
+    "ParamName=newParam", 
+    "LB/IC=ll",
+    "RB/IC=RR",
+    "Ordinal=all",
+    "SaveLen=-1",
+    "DFEs=UrlEncoding",
+    SEARCH_FILTERS,
+        "Scope=body",
+	LAST);
+
+Ex:
+Action()
+{
+ 
+       //Placed above the request
+       web_reg_save_param_ex(
+           "ParamName=uName", 
+           "LB/IC=value=\"",
+           "RB/IC=\"/>",
+	               LAST);
+	
+	web_url("WebTours",
+		"URL=http://127.0.0.1:1080/WebTours/", 
+		"TargetFrame=", 
+		"Resource=0", 
+		"RecContentType=text/html", 
+		"Referer=", 
+		"Snapshot=t1.inf", 
+		"Mode=HTML", 
+		LAST);
+
+	lr_start_transaction("Login");
+
+	web_submit_data("login.pl", 
+		"Action=http://127.0.0.1:1080/cgi-bin/login.pl", 
+		"Method=POST", 
+		"TargetFrame=body", 
+		"RecContentType=text/html", 
+		"Referer=http://127.0.0.1:1080/cgi-bin/nav.pl?in=home", 
+		"Snapshot=t2.inf", 
+		"Mode=HTML", 
+		ITEMDATA, 
+		"Name=userSession", "Value={uName}", ENDITEM,  
+		"Name=username", "Value=appu", ENDITEM, 
+		"Name=password", "Value=appu", ENDITEM, 
+		"Name=login.x", "Value=46", ENDITEM, 
+		"Name=login.y", "Value=9", ENDITEM, 
+		"Name=JSFormSubmit", "Value=off", ENDITEM, 
+		LAST);
+
+	lr_end_transaction("Login",LR_AUTO);
+
+	return 0;
+}
+
+Correlation error: N match found for requested parameter
+Reason:
+->Placement of Correlation function is not correct, Place above the request only
+->LB and RB may be incorrect, need to cross check once.
+->Server may be down to send response.
+
+Note:
+//To set max length of LR Param : No of characters
+web_set_max_html_param_len("1000");
+To be added at beginning only
+Applied to all LR param used in script
+Bydefault 256 characters
+
+NOTE:extension parameter.dll error, check if u deckare lr parameter and not given anvalue or file may be deleted
+
+How to identify which value to be correlated
+--------------------------------------------
+Method 1: 
+->Record the script
+->Open Design Studio
+->It shows all dynamic values
+->To identify only required values to be correlated
+    After recording if we click on DS, it shows n number of values to be correlated
+    Correlated Value will be having no meaning and it will be alpha numeric OR 	
+    See which transaction is failing and in that transaction which are the dynamic values and correlate those values only
+
+Method 2:
+->Record the same script twice with same data and all configuration and compare the two values 
+	Create two actions, FR and SR
+	Record the script twice in those
+	Double click on FR, CLick on Tools, Compare and select file to compare
+        Double click on SR, Click on Tools, Compare and select the file showing there to compare
+
+Method 3:
+->Record the same script twice with same data and all configuration and compare the two values 
+	Create two actions, FR and SR
+	Record the script twice in those
+	Use online tool to compare both
+www.diffchecker.com
+
+80% times automatic works 20% times manual works
+
+
+
+Note: Using Design studio or by comparing two script we can identify dynamic values
+
+Steps to do Manual correlation
+-------------------------------
+->Identify dynamic value
+  Using design studio or by recording same script twice and comparing it
+->Open Output->Code generation logs->Point cursor to top
+  Search[ctrl f or top search option] and identify the identified dynamic value in response section ** only
+  Identify Left and Right boundary
+->Build web_reg_save_param_ex() function
+  Go to tool bar
+  Search web_reg_save_param_ex()
+  Double click on it
+  Provide all required parameter
+
+web_reg_save_param_ex()
+Mandatory parameters:
+LB
+RB
+ParamName
+
+Note: If we need to consider new line while specifying RB then use  \n
+Ex:
+user name ="123Appu"
+password = 
+
+My LB should be user name = "
+and my RB should be 
+"
+password=
+
+Then
+RB="\npassword=
+
+->Place exactly above the request where we get response 
+->Use wherever needed in further requests {LRParamVaribaleName}
+
+Note: Correlate once where we get first from response, use any where in future in any number of request the LR Param
+
+request->response->correlation->request
+
+Ex:
+
+	web_reg_save_param_ex(
+		"ParamName=userSession",
+		"LB=name=\"userSession\" value=\"",
+		"RB=\"/>",
+		SEARCH_FILTERS,
+		LAST);
+
+Note: If we want white spaces given in lb and rb should be considered then use web_reg_save_param else use web_reg_save_param
+NOTE: Security Application recording issue
+->Open application in IE
+->Right click, properties, in connection see type of connection ssl version will be mentioned
+->Go to Vugen, 
+recording option-mapping and filtering-option-check enable auto ssl detection-select specific version
+
+If issue in re playing script due to security
+->Open application in IE
+->Right click, properties, in connection see type of connection ssl version will be mentioned
+->Add in start of the script
+
+web_set_socket_option("SSL_VERSION","version specified in property");
+
+NOTE: On c var we can do any arithemetic operation but on LR we cant able to do , need to convert and do
+
+Fetching multiple value and using random out of it
+--------------------------------------------------
+->Identify LB and RB which fetch multiple values 
+->Provide "Ordinal=ALL" attributes
+->If we provide Ordinall=All then LR Param will become array variable
+web_reg_save_param_ex(
+"ParamName=cDepartureCity",
+"LB=<option value=\"",
+"Ordinal=ALL",
+"RB=\">",SEARCH_FILTERS,LAST);
+Now the array variable cDepartureCity contains N values
+->To pick random one value from array use lr_paramarr_random() function after the request
+->Return type of it is String, so store it into string
+->Convert C string value to LR Param and use in the script
+char *singleRandomDepartureCity=lr_paramarr_random("cDepartureCity");
+lr_param_sprintf("randomCity","%s",singleRandomDepartureCity);
+{randomCity}
+
+Ex:
+	lr_start_transaction("clickflight");
+
+        //Correlation function
+	web_reg_save_param_ex(
+		"ParamName=cDepartureCity",
+		"LB=<option value=\"",
+		"RB=\">",
+		"Ordinal=ALL",
+		SEARCH_FILTERS,
+		LAST);
+
+       //Web request
+	web_url("Search Flights Button", 
+		"URL=http://127.0.0.1:1080/cgi-bin/welcome.pl?page=search", 
+		"TargetFrame=body", 
+		"Resource=0", 
+		"RecContentType=text/html", 
+		"Referer=http://127.0.0.1:1080/cgi-bin/nav.pl?page=menu&in=home", 
+		"Snapshot=t3.inf", 
+		"Mode=HTML", 
+		LAST);
+	//Getting single value from LR param array and storing to C  
+	singleRandomDepartureCity=lr_paramarr_random("cDepartureCity");
+	lr_param_sprintf("randomCity","%s",singleRandomDepartureCity);
+
+	lr_end_transaction("clickflight",LR_AUTO);
+
+Ordinal options:
+ALL: capture all matching values
+1: Capture first matching value
+2: Capture 2 nd matching value
+
+Savelen=3
+fetch only 3 character from the value
+SaveOffset=2
+takes first two character from the value
+
+
+Pick specific value from array
+-------------------------------
+->Identify LB and RB which fetch multiple values 
+->Provide "Ordinal=ALL" attributes
+->If we provide Ordinall=All then LR Param will become array variable
+web_reg_save_param_ex(
+"ParamName=cDepartureCity",
+"LB=<option value=\"",
+"Ordinal=ALL",
+"RB=\">",SEARCH_FILTERS,LAST);
+Now the array variable cDepartureCity contains N values
+->To pick specific value from array use lr_paramarr_idx() function after the request
+->Return type of it is String, so store it into string
+->Convert C string value to LR Param and use in the script
+char *singleRandomDepartureCity=lr_paramarr_idx("cDepartureCity",3); //pick 3rd value from the array
+lr_param_sprintf("randomCity","%s",singleRandomDepartureCity);
+{randomCity}
+
+Ex:
+	lr_start_transaction("clickflight");
+
+        //Correlation function
+	web_reg_save_param_ex(
+		"ParamName=cDepartureCity",
+		"LB=<option value=\"",
+		"RB=\">",
+		"Ordinal=ALL",
+		SEARCH_FILTERS,
+		LAST);
+
+       //Web request
+	web_url("Search Flights Button", 
+		"URL=http://127.0.0.1:1080/cgi-bin/welcome.pl?page=search", 
+		"TargetFrame=body", 
+		"Resource=0", 
+		"RecContentType=text/html", 
+		"Referer=http://127.0.0.1:1080/cgi-bin/nav.pl?page=menu&in=home", 
+		"Snapshot=t3.inf", 
+		"Mode=HTML", 
+		LAST);
+	//Getting single value from LR param array and storing to C  
+	singleRandomDepartureCity=lr_paramarr_idx("cDepartureCity",3);
+	lr_param_sprintf("randomCity","%s",singleRandomDepartureCity);
+
+	lr_end_transaction("clickflight",LR_AUTO);
+
+
+Defining rules for Correlation
+------------------------------
+->If same correlation for a transaction ex: session id for login has to be made for each actions[book flight, cancel flight,..] or on each time we record the script, then we can make rules so while recording itself rules will be applied and tool itself do correlation while generating the script.
+->But we should be aware of LB and RB to create the rules.
+
+Steps to create rule:
+Method 1:
+->Create application [AUT] for which rules to be made
+  Go to recording option,Correlation,Rules,New Application, Give AUT name
+->Record the script, Go to design studio, It shows all the correlated values, Select for which value need to be correlated, Click on Add rule, provide name for the rule and select created application from dropdown, Click on Add
+
+Method 2:
+->Create application [AUT] for which rules to be made and rules 
+  Go to recording option,Correlation,Rules,New Application, Give AUT name. OR Select existing application if already created
+  Click on New RUle, Select first option from dropdown, "Search for parameters in all of the body text", select Scan type as Boundary based, provide LB and RB. Provide var name
+  
+Now if we record the action, automatically correlation will be made by tool.
+
+Regular Expression
+------------------
+[] : match one position[character or number or symbols]
+Ex: 
+[pt] either p or t matches
+[ab][cd] either a or b, either c or d
+[a-z] any character from a to z
+[a-z,A-Z] any upper or lower case character a,S,x,...
+[a-z]{2} matches 2 character or positions, length of 2 as,sd,bb, ...
+[a-z,A-Z]{2,5} : lower case a to z of length 2 or 3 or 4 or 5 appPu
+
+{min , max} 
+[a-z]{1,} : min 1 max infinity length
+
+[a-z]* : all lower case with any length
+
+[a-z]: all lower case with length 1 to infinity
+
+all char, digits of any length
+[a-z,A-Z,0-9]*
+[a-z,A-Z,0-9]+
+[a-z,A-Z,0-9, ]*
+
+[a][b][c]? 
+a followed by b and c is optional
+
+*: 0 to infinity
++:one to infinity
+?: optional
+[]: one position
+
+(.*)?: capture all as group
+
+web_reg_save_para,_regex()
+
+To fetch one value based on regular expression:
+web_reg_save_para,_regex(
+"ParamName=userSessionLRParam",
+"RegExp=regular expression value which fetch single value",
+LAST
+);
+
+Ex:
+web_reg_save_param_regexp(
+		"ParamName=cUserSession",
+		"RegExp=<input type=\"hidden\" name=\"userSession\" value=\"([^\"]*)\"/>",
+		SEARCH_FILTERS,
+		LAST);
+Regex: ([^\"]*)
+
+
+To fetch multiple value
+web_reg_save_para,_regex(
+"ParamName=departureCitiesLRParamAsArray",
+"RegExp=regular expression value which fetch multiple value",
+"Ordinal=All",
+"Group=1",
+LAST
+);
+
+Ex:
+web_reg_save_param_regexp(
+		"ParamName=c_DepartureCities",
+		"RegExp=<option [a-z=\" ]+([A-Za-z\\s]+)\">[A-Za-z\\s]+</option>",
+		"Group=1",
+		"Ordinal=ALL",
+		SEARCH_FILTERS,
+		LAST);
+
+
+Group: Anything enclosed within () is known as group, Group attribute specifies which group in provided regular expresion to be fetched
+0: entrie pattern
+1: first group
+2: second group
+To use
+{LR ParamName}
+
+Regex Example:
+<option selected="selected" value="Denver">Denver</option>
+<option value="Frankfurt">Frankfurt</option>
+<option value="London">London</option>
+<option value="Los Angeles">Los Angeles</option>
+
+RE: <option [a-z=" ]+[A-Za-z\s]+">[A-Za-z\s]+</option>
+selected="selected" value="  ->[a-z=" ]+
+Denver -> [A-Za-z\s]+
+>Denver -> [A-Za-z\s]+
+
+To fetch any specific value it should be in group, so enclose in () the value to be fetched
+New RE with group : <option [a-z=" ]+([A-Za-z\s]+)">[A-Za-z\s]+</option>
+
+Ex: Regex for Multiple values, fetching one from it and using it.
+
+lr_start_transaction("clickflight");
+
+	//Regex
+	web_reg_save_param_regexp(
+		"ParamName=c_DepartureCities",
+		"RegExp=<option [a-z=\" ]+([A-Za-z\\s]+)\">[A-Za-z\\s]+</option>",
+		"Group=1",
+		"Ordinal=ALL",
+		SEARCH_FILTERS,
+		LAST);
+	
+	web_url("Search Flights Button", 
+		"URL=http://127.0.0.1:1080/cgi-bin/welcome.pl?page=search", 
+		"TargetFrame=body", 
+		"Resource=0", 
+		"RecContentType=text/html", 
+		"Referer=http://127.0.0.1:1080/cgi-bin/nav.pl?page=menu&in=home", 
+		"Snapshot=t3.inf", 
+		"Mode=HTML", 
+		LAST);
+        
+        //Converting LR Param to C to fetch any one random value, storing back to new LR param to use in next request
+	singleRandomDepartureCity=lr_paramarr_random("c_DepartureCities");
+	lr_param_sprintf("randomCity","%s",singleRandomDepartureCity);
+
+           
+	lr_end_transaction("clickflight",LR_AUTO);
+
+	lr_start_transaction("findflight");
+
+	web_submit_data("reservations.pl", 
+		"Action=http://127.0.0.1:1080/cgi-bin/reservations.pl", 
+		"Method=POST", 
+		"TargetFrame=", 
+		"RecContentType=text/html", 
+		"Referer=http://127.0.0.1:1080/cgi-bin/reservations.pl?page=welcome", 
+		"Snapshot=t4.inf", 
+		"Mode=HTML", 
+		ITEMDATA, 
+		"Name=advanceDiscount", "Value=0", ENDITEM, 
+  
+                 //Using random value in this request
+		"Name=depart", "Value={randomCity}", ENDITEM, 
+
+		"Name=departDate", "Value=09/03/2024", ENDITEM, 
+		"Name=arrive", "Value=Denver", ENDITEM, 
+		"Name=returnDate", "Value=09/04/2024", ENDITEM, 
+		"Name=numPassengers", "Value=1", ENDITEM, 
+		"Name=seatPref", "Value=None", ENDITEM, 
+		"Name=seatType", "Value=Coach", ENDITEM, 
+		"Name=findFlights.x", "Value=34", ENDITEM, 
+		"Name=findFlights.y", "Value=10", ENDITEM, 
+		"Name=.cgifields", "Value=roundtrip", ENDITEM, 
+		"Name=.cgifields", "Value=seatType", ENDITEM, 
+		"Name=.cgifields", "Value=seatPref", ENDITEM, 
+		LAST);
+
+	lr_end_transaction("findflight",LR_AUTO);
+
+************************************************************************************************************************************************
+Types of Performance Testing
+============================
+Load test
+--------- 
+->This test ensures tat the AUT is stable to handle expected peak load once the application is deployed
+->Current or Peak load test[Max load allowed for the application] to check the response time of AUT
+->Mandatory test
+->Runs for 1 hour with peak load
+->If system handles peak load, then it can handles all lower loads than peak load
+Ex: test how 5 seater car run for 5 customer
+->usually load test will be run for 1 hour
+
+Ramp up: Users entering into system
+Ramp down: Users leaving the system
+Steady state: User using the system
+
+Stress test
+-----------
+->Increase the user loads until the application breaks
+->To find the breaking or saturation point
+
+How to know breaking point:
+Response time increase drastically and transaction starts failing
+
+Endurance or Soak test
+----------------------
+->Run test for longer time duration of 8, 16  or 24 hours.
+->Done with 50% or 70% of peak load
+->Usually 8 hours with 70% of peak load
+->To check the stability , Response time should be same even for hr 1 or hr 8.
+First hour response time = 8th hour response time
+->To check memory leaks
+  First one hour app is fast but as on progress app respond slower this indicates the memory leak.
+  Heap memory will be leaked
+
+Scalable Test
+-------------
+->Future load test
+Peak load is 100 , it may increase for 150 so we need to do test for 150 users for one hour. 
+
+Volume test
+-----------
+->Conduct test with huge data
+->If there is huge data then will it impact the response time
+->Same as load test but only increase the data and test
+
+Capacity test
+--------------
+->To see how many users our system will support without affecting SLA
+->Without affecting response time, maximum load supporting by the system.
+->load of capacity test will be always lesser then stress test 
+
+************************************************************************************************************************************************
+Controller
+==========
+->Combines two or more scripts Ex: Book flight, Cancel flight, ... and execute them simultaneously with multiple users using one or two LG.
+->In Vugen we execute each script separately with one user only.
+
+-> Always create script in Vugen, execute it with multiple users[different creds] for multiple iteration so to make sure all parameterization and correlation is working fine.
+
+Scenario 1:
+Book flight    LG1  250 users
+Cancel flight  LG2  123 users 
+
+Scenario 2: Banking application
+->Create script in Vugen, execute it with multiple users[different creds] for multiple iteration so to make sure all parameterization and correlation is working fine.
+->In banking application we have 50 scripts, need to run for 1000 users.
+
+Script          LG   # Users
+Account summary LG1  222 users
+Balance enquiry LG2  300 users
+.
+.
+.
+50 scripts           1000 users
+
+->Put all 50 scripts into controller and execute shake down or dry run test for 1 user, if it passes then 
+->set load 1000 users, execute Load test
+->Verify Response time based on SLA, if not bottleneck is identified and team will fix the issue and repeat the process for iteration 2
+
+Process
+-------
+->Separate scripts are created for the application from Vugen, Execute it with multiple credentials with multiple iterations to make sure script is working fine 
+->Now add all those scripts into Controller, and run for 1 user [Shake down or Dry run test]
+->Put Actual load based on WLM ex: 1000 users and perform LOAD TEST
+->Identify bottleneck
+->Dev/Performance engineering  team should fix the issue 
+->Re run the LOAD TEST
+->Continue this process until Response time matches SLA
+->After Load test passes, Execute STRESS, SOAK, ENDURANCE TEST
+->If time permits, perform SCALABILITY TEST
+->Any bottle neck in any of the test, then development team or performance engineering team will fix it then we need to re run the respective tests.
+
+LR Architecture
+---------------
+
+VUGEN                     CONTROLLER                         ANALYSIS                                                       
+Book flight    ===>       Book flight     LG1  200   ===>    LG1+LG2 result
+Cancel flight             Cancel flight   LG2  300
+                          
+LOAD GENERATOR/AGENT MACHINE                  AUT
+LG1    LG2                      <===>   
+
+Vugen create script and push to Controller
+Controller distributes loads into one or more LG
+LG will download scripts and feed to different users and execute those on AUT
+Final result individually given back by each LG to Controller
+Controller combines the result given by different LG
+PT should pick the combined result and should feed to Analysis to analyze the result
+
+ 
+IQ: Issues in Controller
+1)Issue in downloading the script from Controller
+  Cause: firewall blocking the communication between controller and lg
+  Sol: open the port 443 in firewall
+
+2)Data issue in controller
+Sol: Do data scrubbing
+
+3) LG not supporting the required user load
+Sol: Increase LG or Distribute the load appropriately between LG
+error message: CPU usage for this LG has been exceeded 
+
+Steps to create Load test from Controller
+----------------------------------------
+Create Scenario->Calculate Pacing->Add scripts to Controller->Do Scenario group setup[Users/LG]->Turn on LG->Set pacing in RTS for each group
+
+Step 1: Create Script from Vugen
+->Create all the scripts from Vugen, run for multiple iteration with multiple credentials and make sure its working fine
+
+Step 2: Calculate pacing
+->Calculate Pacing using WLM
+
+Ex: Peak hour, 38 users need to run for one hour
+Script           TPH  Percentage of transaction N   SET[Secs]  TPS     N/TPS   Pacing [N/TPS-SET]
+                                               38
+Book Flight      500  0.5                      19    70        0.1388  136.8    66.8
+Login            300  0.3		       11    18        0.0833  132      114
+WindowShopping   200  0.2		       8     49        0.0555  144       95       
+                -----
+                 1000
+
+N and TPH will be given by Client
+
+TPH: 
+Given by Client
+
+Percentage of transaction: 
+TPH/Total TPH
+
+N: 
+Total Given by Client, Individual for each transaction need to calculate
+TPH * Percentage of transaction
+
+SET[Secs]:
+Execute script for one user and get from Vugen
+
+TPS:
+TPH/3600
+
+Step 3: Add Scenario from Controller
+->Open Controller, Select Manual scenario, Select No of users to distribute the load
+->Select and add all the required script and click on Ok
+->Now all script will be displayed on Scenario Groups section
+
+Notes:
+->Each script will be one group, One LG can handle one to N groups
+->After initial also we can add scripts by clicking on each row and browsing
+->We can change Group name if required
+
+->LG is one who provides VUsers [local host]
+
+
+Step 4: Do Scenario group setup 
+->Change the group name if required
+->If needed add more script by clicking on each row and browsing required script
+->In Scenario schedule section, Select Schedule By/Basic schedule so we can able to edit no of Vusers for each scripts 
+->Update Quantity for each script[No of Users]
+->Now save the scenario after adding scripts, providing no of vusers for each scripts.
+
+Step 5: Add LG from Controller
+Ex: Controller preent in Appu PC
+
+  LG 1[handles 100 users]
+  Shivu PC
+  192.12.0.1
+  
+  LG2[handles 200 users]
+  Raghu PC
+  192.12.0.1
+
+->Click on Scenario in Controller, at top tab
+->Click on Load generator, Click on Add 
+->Provide name of the pc ex: Shivu PC or IP address of the system
+->Select OS
+->Click on OK
+->Now the LG has been added to Controller
+->We can add any number of LG based on requirement
+
+Note: All added LG should be in same network of the controller to connect and use
+
+Step 6: Selecting LG for each Group from Controller
+->Select any specific scenario in Scenario Group section in Controller
+->Click on Load Generator column and select added LG 
+Note: If LG is in same machine then it will be local host or ip address of local system
+
+Step 7: Turn on LG
+->Before using LG it should be in ready state
+->Select Scenario in top tab, Load generator and select specific Load generator and click on Connect
+->Status changes from Down to ready
+
+Step 8: Set pacing in RTS for each group
+->Right click on each group, Click on RTS, Click on pacing, Provide pacing
+->To provide N/TPS-SET, Select Second option "After the previous iteration ends fixed delay of _calculated N/TPS-SET value____"
+->To provide N/TPS, Select Third option "At fixed intervala evry _calculated N/TPS value____"
+
+Step 9: Other RTS setting
+->Log: Parameter sub and Data returned by server for Dry run test for load test set to default [Standard logs]
+->Think Times: 50 to 150% and limit think time set to 10 sec 
+->Miscellaneous:  In Automatic transaction, un check both options
+
+Save the scenario
+Note: In details tab at top we can see all details of the script and also open script, rts,..
+      If we do any changes in script after adding to controller, go to details and refresh the script to see all updated informations
+
+Step 10: Scenario schedule setup
+Schedule by : Scenario
+Run mode: Basic schedule
+
+Step 11: Global schedule setup 
+->Used to create different types of test
+->Setup ramp up, ramp down and duration setting
+
+Strat Vusers: Ramp up, Users entering into system
+Duration: Steady state, User executing the system
+Stop users: Ramp down, User leaving the system
+
+Load test:
+Scenario schedule setup
+Schedule by : Scenario
+Run mode: Basic schedule
+
+User quantity: Peak load percentage distributed across the scenario groups
+Strat Vusers: ramp up 5 users for every 30 sec
+Duration[Steady state]: time to execute[1 hour]
+Stop Vusers: ramp down 5 users for every 30 sec
+Save the scenario as LOAD TEST
+
+Endurance or Stability or SOAK Test:
+Scenario schedule setup
+Schedule by : Scenario
+Run mode: Basic schedule
+
+User quantity: 70% of Peak load percentage distributed across the scenario groups  
+Strat Vusers: ramp up 5 users for every 30 sec
+Duration: time to execute[8 hour]
+Stop Vusers: ramp down 5 users for every 30 sec
+Save the scenario as ENURANCE TEST
+
+Scalability Test:
+Scenario schedule setup
+Schedule by : Scenario
+Run mode: Basic schedule
+
+NFR: 100% growth in user load in next 3 months 
+Current peak load: 38 so 38*2: 76 Users 
+
+User quantity: 100% of Peak load[Current peak load: 38 so 38*2: 76 Users] percentage distributed across the scenario groups  
+Strat Vusers: ramp up 5 users for every 30 sec
+Duration: time to execute[1 hour]
+Stop Vusers: ramp down 5 users for every 30 sec
+Save the scenario as SCALABILITY TEST
+
+Stress test:
+Scenario schedule setup
+Schedule by : Scenario
+Run mode: Real world schedule
+
+->Increase 3 times the peak load and execute, if not fails then increase 5 times the peak load and execute 
+OR
+->Increase 3 times the peak load and execute, if not fails then increase the users as test is running until its fails
+->No Steady state, Ramp up and Ramp down
+->Current peak load: 38 so 38*3
+->Delete Ramp down, Steady sate[duration]
+
+User quantity: 3 times the current Peak load[Current peak load: 38 so 38*3] percentage distributed across the scenario groups 
+Strat Vusers: ramp up 5 users for every 30 sec
+Duration: delete
+Stop Vusers: delete
+Save the scenario as STRESS TEST
+
+Capacity Test:
+Scenario schedule setup
+Schedule by : Scenario
+Run mode: Real world schedule
+
+->Multiple ramp up and ramp down with different steady test
+->Ramp up 38 peak load users every 30 sec run for 10 min, then again add 10 more users with same 30 sec ramp up time run for 10 min same repeat the process to find breaking point.
+
+User quantity: Initial Peak load percentage distributed across the scenario groups, later increase 10 users 
+Strat Vusers: ramp up 38 Peak load users for every 30 sec
+Duration: Run for 10 min
+Strat Vusers: ramp up 10 users for every 30 sec
+Duration: Run for 10 min
+Strat Vusers: ramp up 10 users for every 30 sec
+Duration: Run for 10 min
+Stop Vusers: Stop all users, 5 for every 30 seconds
+
+To add new action:
+Click on action, Select required action, Provide no of users, provide ram up time
+Apply and Ok
+
+Step 12: Execute the Load Test
+->Click on result tab on top, select the destination folder to store results
+->Click on Start
+->State flow:
+Down->Pend->Ini->Ready->Run->Gradual exiting->Stop/Error
+
+In Between it can go to Rend point state if we added in the script
+
+->To add more user or to remove few user, click on running users and there are option to start, stop, run and add new users.
+To stop any user, click on Gradual stop
+->To do ay changes in setting, Pause scheduler, do changes save and resume scheduler
+
+->To see what user doing through run time viewer or logs during execution
+  Click on the Run[Scenario group Run tab] link, Select the user, at top click on View user or logs option 
+
+->Stop vs Gradual stop
+Stop: Immediately that specific user will stop executing and will not execute any remaining iterations
+Gradual stop: Complete that iteration and stop
+
+->Execution flow
+User 1 Takes Book flight script
+Execute iteration 1 with think time
+Execute Pacing time
+Execute iteration 2 with think time
+Execute Pacing time
+.
+.
+Till one hour or specified duration User1 will keep on executing Book flight script
+
+Similarly other users will be executing simultaneously
+
+->No of Failed transaction
+5% is acceptable, if more than it then need to stop the test and need to analyze the result.
+Reasons: data issue/network issue/minor script issue/server issue
+
+->How to analyze failed transaction logs 
+Go to result folder, go to logs 
+In logs we can see logs for each user and their respective iterations
+
+
+Scenario Schedule Options
+-------------------------
+
+1) 
+Schedule by : Scenario
+Run mode: Basic schedule
+
+->Can have only one Strat Vusers, Duration and Stop users
+->Cannot able to delete Strat Vusers, Duration and Stop users.
+-> All users Ramp up->All users Steady state->All users Ramp down
+
+2) 
+Schedule by : Scenario
+Run mode: Real world schedule
+
+Note: Always use Percentage distribution if we select this option initially when we selected manual option when we opened the controller
+Click on Top Scenario tab, Select convert to percentage
+
+
+->Can have multiple Strat Vusers, Duration and Stop users
+->Can able to delete Strat Vusers, Duration and Stop users.
+->Used for Stress testing, To execute without Steady state and Ramp down
+->Can be used to setup below scenario
+Few users Ramp up->Few users Steady state->Ramp up->Few users Ramp up->Few users Steady state->Few users Ramp down->Few users Steady state
+->Few users Ramp down->Few users Steady state
+
+Ex: 
+Capacity Test:
+->Multiple ramp up and ramp down with different steady test
+->Ramp up 38 peak load users every 30 sec run for 10 min, then again add 10 more users with same 30 sec ramp up time run for 10 min same repeat the process to find breaking point.
+
+Schedule by : Scenario
+Run mode: Real world schedule
+
+Strat Vusers: ramp up 38 Peak load users for every 30 sec
+Duration: Run for 10 min
+Strat Vusers: ramp up 10 users for every 30 sec
+Duration: Run for 10 min
+Strat Vusers: ramp up 10 users for every 30 sec
+Duration: Run for 10 min
+Stop Vusers: Stop all users, 5 for every 30 seconds
+
+
+********************************************************************************************************************************************************
+Note:
+->Vugen script extension: .usr [user]
+->Controller extension: .lrs  [load runner scenario]
+
+Note:
+->In Load runner software when we installed it will install all the components, Vugen, Controller, Analysis, LG
+->If need we can install only specific components
+
+********************************************************************************************************************************************************
+LR Components Functionality
+---------------------------
+VUGEN
+Script Creation
+
+Controller
+Load test configuration
+Combines result provided by different LG
+
+LG
+Create VUsers and Execute the script on AUT
+
+Analysis
+Analyse the result
+
+********************************************************************************************************************************************************
+

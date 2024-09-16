@@ -1,0 +1,133 @@
+->Git vs GitHub vs GitLab
+Git: VCS, manages our files through snapshot.
+GitHub/GitLab/Bitbucket: Hosting platform provides central repository to store files.
+
+Working Directory --Git Add-->Staging Area[Index]--Git Commit-->Local Repository--Git Push-->Remote Repo
+
+         <----------------Git Checkout--------------------------------      <------Git Pull------
+
+         <----Git reset------------     
+      
+
+->To configure Git
+git configure --global user.name "<Any name>"
+git configure --global user.email "<Any email>"
+git config
+
+->To create local repo:To create empty repo contains logs,branches,head,....info
+git init
+
+->To check status
+git status
+
+Red: Not in Staging area, its in local machine
+Green: In Staging area, not in local repo
+
+->To add to Staging area
+git add .
+git add *
+git add <filename>
+
+->To move to Local repo
+git commit -m "<message>"
+
+->To check commit details
+git log
+git log --oneline
+
+->To add local and remote repo
+git branch -M main
+git remote add origin https://github.com/CLNandeesh/GitPractiseTA.git
+
+->To move from local to remote repo
+git push -u origin main OR
+git push -u origin master
+git push -u origin <branchname to be pushed>  
+
+->To clone existing repo
+git clone <URL>
+
+->To move from Remote to Local
+Before push, need to do pull to get all latest update.
+
+git pull origin main OR
+git pull origin master
+
+BRANCHES
+========
+->To list branch
+git branch
+git branch -a
+
+->To fetch remote branch to local
+git fetch OR
+git pull
+
+->To switch to specific branch
+git switch <branchname>
+
+->To create new local branch
+git branch <branchname>
+
+->To create and switch to the branch in local
+git checkout -b <branchname>
+
+->To push to specific branch from local repo to specific branch of remote repo
+Be in that specific branch say feature1
+git push origin feature1  //all code of local feature 1 will be pushed to remote feature1
+
+Now in remote repo we can merge feature1 to master branch
+
+->To push newly created local branch to remote repo
+git push --set-upstream origin <new local  created branch name>
+
+
+FLOW
+====
+create branch in remote - manually create it say feature1
+pull to local - git pull
+switch to that branch - git switch feature1
+work on it , add and commit
+push the new changes to the new branch of remote - git push origin feature1
+Create pull request to merge
+Review and merge remote new branch changes to main branch -> compare and pull in remote -> Merge pull request by Confirming, now main branch have all new code of feature1 branch
+delete the branch feature1
+Switch to main branch in local and do pull to get all latest changes[feature 1 changes] of remote main to local main branch
+
+->Git Ignore
+Adding files to git ignore
+Create .gitignore ile and add all the files which not to be pushed to remote repo
+
+->To find difference between 2 commits
+git diff <commitid1> <commitid2>
+
+->To revert back to specific commit
+git revert <commitID>
+git revert HEAD
+
+->Resolve Merge Conflict
+
+Dev: A and B
+Branch: Main and Dev
+File: temp
+Both working in Local
+
+Dev A working in Dev branch, added appu and punith to temp file
+Dev B working in Main branch and added shivu and Raghu into temp file.
+
+tried to merge Dev branch changes to Main branch.
+
+Be in main branch and do merge 
+git merge dev //merging dev branch to main branch in local. leads to merge conflict, auto merging fails.
+
+Which one to keep and which one to delete or do we need to keep both.
+
+Solution:
+Keep either one or both and then perform
+save, add and commit. 
+Now auto merging will be success. All changes of Dev branch will be merged to main branch. 
+Now we can push main branch of local to remote.
+
+
+
+ 

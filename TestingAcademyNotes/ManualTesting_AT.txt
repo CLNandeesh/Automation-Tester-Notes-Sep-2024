@@ -1,0 +1,102 @@
+->Types of Software
+System software
+ Software controls system internal functioning and hardware devices like speakers, monitors,..
+ OS, Drivers, Language processors,..
+ Written in Low level language C, C++, ...
+
+Application software
+ Designed to perform specific task for the end users
+ General purpose: Ms Word, Power point,...
+ Utility purpose: Antivirus, Disk cleaner, ...
+ Customized software: FB,...
+ Written in High level language like Python,...
+ 
+ ->What is Software testing
+ Validate actual implementation and expected requirement are matching
+ Part of SDLC
+
+->Obj and Purpose of ST
+ Quality product
+ To meet Business requirement specification
+ Find and Prevent defects
+ Within time and budget
+ Customer satisfaction
+ 
+Req specified is delivered to Customer with minimal or no defects[Requirement fulfilling] and minimal budget and time-> QUALITY
+
+->Daily activities as QA
+Check Email
+Scrum call
+ Yesterday task/Today task/Any blocker
+Previous day work
+ TC writing
+ Test Planning
+ Defect Log or Retest
+Meetings
+Review TC
+Email for Test report
+TC execution
+Run and check builds
+Analysis and root cause identification [Triage call]
+Reviewing Req specifications
+Exploratory testing
+Collaboration with Dev team
+UAT
+Test case, test scenario design and maintain RTM
+Accessibility testing
+Re testing defects and update Jira
+Effective communication with team leads, on site coordinators and Clients.
+Email to QA lead regarding the status
+
+Involve in Automation
+ Scrum calls
+ Automation Test case Priorities set
+ Automating test cases
+ Daily Automation run [Maintenance+ Fixing architecture problems]
+ Reports
+ Run Builds and check builds
+ Stay updated with latest tools and technologies
+ Test env setup and maintenances 
+ POC
+
+->Levels of ST
+Unit
+Integration
+System
+UAT
+
+
+->SDLC
+Planning and Defining
+ Performed by BA and Project manager
+ Create the requirements to be developed as form of Document [SRS/BRS] and get approval from Client
+Designing
+ Creates the designs[Mockup/Wire frames]
+ Figma, Adobe, Zeppelin, Miro board, .... tool will be used
+Development
+ Dev team work on developing product
+Testing
+ Testing team will start execution 
+Deployment
+ Deploy build to Server
+
+->STLC
+Requirement analysis
+ Wireframes, Epic or features, Confluence page
+ Read, Analysis, Discuss, Review the requirement
+Test Planning
+ All the details of the testing
+ Created by Test lead
+ Objective, Test Env, Recourses, Defect reporting procedure, Test strategy, Test Schedule, Test deliverables,...
+ Can be created in Xray
+Test scenario identification, TC creation and Review
+ Understand requirements, Identify scenarios and convert into test cases.
+ Review with Peer
+Test env setup
+Test execution
+Test closure
+
+Requirements->Test Plan ->Test Scenarios->Test Cases->Test case execution->Bug tracking
+Manual Test cases->Automation Test cases
+
+ 

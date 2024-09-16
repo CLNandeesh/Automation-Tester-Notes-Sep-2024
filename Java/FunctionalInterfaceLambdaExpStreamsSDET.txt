@@ -1,0 +1,1014 @@
+Lambda Functions
+================
+Anonymous function with no return type, access modifiers and name.
+No data type in arguments
+No curly brackets if there is single statement.
+If there is single arg then no need to use bracket.
+If there is return statement then need to add curly braces else need to remove return statement and also curly braces.
+
+
+Ex:
+public void m1()
+{
+sop("hai");
+}
+
+()->sop("hai");
+
+Ex:
+public void m1(int a,int b)
+{
+sop(a+b);
+}
+
+(a, b)->sop(a+b);
+
+Ex:
+void m1(int a)
+{
+return a*a;
+}
+
+a->a*a;
+OR
+a->{return n*n;};
+
+Functional Interface[SAM]
+-------------------------
+From Java 8, Interface can have default method, static methods and abstract methods.
+Interface having single abstract method and any number of default method, static methods is SAM or Functional Interface.
+Lambda expression is used to implement Functional Interface abstract method.
+@FunctionalInterface annotaion
+
+Ex: Runnable Interface have run()
+Comparable Interface have compareTo()
+Callable Interface have call()
+Abstract Listener Interface have actionPerformed()
+
+
+Ex:
+@FunctionalInterface
+interface Cab
+{
+    public  void bookCab();
+}
+
+class Ola implements Cab
+{
+    public void bookCab()
+    {
+        System.out.println("Ola Cab is BOOKED");
+    }
+
+
+}
+public class Lambda1 {
+    public static void main(String[] args) {
+        Cab cab=new Ola();
+        cab.bookCab();
+    }
+
+}
+
+
+LAMBDA Exp
+
+@FunctionalInterface
+interface Cab
+{
+    public  void bookCab();
+}
+public class Lambda1 {
+    public static void main(String[] args) {
+        Cab cab=()->System.out.println("Ola Cab is BOOKED");
+        cab.bookCab();
+    }
+
+}
+
+Ex:
+@FunctionalInterface
+interface Cab2
+{
+    public  void bookCab(String source,String destination);
+}
+
+public class Lambda2 {
+
+    public static void main(String[] args) {
+        Cab2 cab=(so,des)->System.out.println("Ola Cab is BOOKED from "+so+" to "+des);
+        cab.bookCab("Mysore","Bangalore");
+    }
+}
+
+Ex:
+@FunctionalInterface
+interface Cab3
+{
+    public  int bookCab(String source,String destination);
+}
+
+public class Lambda3 {
+    public static void main(String[] args) {
+        Cab3 cab=(so,des)->
+        {
+            System.out.println("Ola Cab is BOOKED from "+so+" to "+des);
+             return 100;
+        };
+       int price= cab.bookCab("Mysore","Bangalore");
+        System.out.println("Price is: "+price);
+    }
+}
+
+Pre Defined Functional Interfaces
+---------------------------------
+Predicate
+Function
+Consumer
+Supplier
+
+All are avl in java.util.function
+
+Predicate Interface
+-------------------
+To check certain condition we use Predicate Inteface
+Takes one arg of any type as input and evaluate it and return boolean value true or false as output
+we can add any number of condition to be checked using lambda expression
+
+Package:import java.util.function.*;
+Abstract Method:test()
+
+
+interface Predicate(T)
+{
+public abstract boolean test(arg0);   
+}
+
+Ex:
+public class Predicate1 {
+    public static void main(String[] args) {
+
+        //To check number is greater than 10 using Lambda exp and Predicate Interface
+        Predicate<Integer> p= i->(i>10);
+        System.out.println("Result is: "+p.test(100));
+        System.out.println("Result is: "+p.test(2));
+
+        System.out.println("****************************");
+
+        //To check length of string is greater than 4 using Lambda exp and Predicate Interface
+        Predicate<String> p2= str->(str.length()>4);
+        System.out.println("Result is: "+p2.test("Appu"));
+        System.out.println("Result is: "+p2.test("Shivaraj"));
+    }
+
+        //Print Array element whose length is greater than 4
+        String names[]={"appu","punith rajkumar","shivaraj"};
+        for(String name:names)
+        {
+              if(p2.test(name))
+              {
+                  System.out.println(name);
+              }
+        }
+
+
+}
+
+Ex: Lambda exp with Object data
+Take employee object and check his sal>50000 and age>30 if yes then prits him name
+
+class Employee
+{
+    String name;
+    double salary;
+    int age;
+    public Employee(String name,double salary,int age)
+    {
+        this.name=name;
+        this.salary=salary;
+        this.age=age;
+    }
+}
+public class Predicate2 {
+
+    public static void main(String[] args) {
+        Employee e1=new Employee("Appu1",51000,26);
+        Employee e2=new Employee("Appu2",70000,36);
+        Employee e3=new Employee("Appu3",30000,46);
+
+        Employee[] emp={e1,e2,e3};
+        Predicate<Employee> pr=i->(i.salary>50000 && i.age>30);
+
+        for(Employee e:emp)
+        {
+            if(pr.test(e))
+            {
+                System.out.println(e.name+" Salary is: "+e.salary+" and his age is: "+e.age);
+            }
+        }
+        
+    }
+}
+
+Ex: Combining Predicates using and/or/negate operator
+
+public class Predicate3 {
+    public static void main(String[] args) {
+        int arr[]={2,44,33,11,24,56,44,34,78,12,3,0};
+
+        Predicate<Integer> p1=i->(i%2==0);
+        Predicate<Integer> p2=j->j>30;
+
+        for(int x:arr)
+        {
+            if(p1.and(p2).test(x))
+            {
+                System.out.println(x + " is even and greater than 30");
+            }
+        }
+    }
+}
+
+Function Interface
+------------------
+Abstract Method: apply()
+Take any type of parameter and return single any type value
+Process and return the response
+To perform some operation and return the value
+Parameter type Return Type should be specified as Generics[LHS]
+
+
+Predicate VS Function
+Function: Take any type of input, Process and return any type of response
+Predicate: take any type of input, Check condition and return boolean response
+
+
+Ex:public class FunctionInterface1 {
+    public static void main(String[] args) {
+
+        Function<Integer,Integer> f1=i->i*i;
+        System.out.println(f1.apply(10));
+
+        //String length
+        Function<String,Integer> f2=s->s.length();
+        System.out.println("Length is: "+f2.apply("Appu"));
+
+    }
+}
+
+Ex: Function Interface on Object
+public static void main(String[] args) {
+        //Takes sal and exp, calculate bonus and give it
+        Employee e1 = new Employee("Appu1", 51000, 26);
+
+        Function<Employee, Integer> f1 = e ->
+        {
+            int age = e.age;
+            double salary = e.salary;
+            if (age > 20 && age <= 30) {
+                 return  200;
+            } else if (age > 30) {
+                return 300;
+            } else {
+                return 400;
+            }
+        };
+        System.out.println("Bonus is: "+f1.apply(e1));
+
+    }
+ 
+
+Ex: Combination of Function and Predicate
+Function: Process and return response
+Predicate: Check condition and return boolean
+
+package function;
+
+import java.util.function.Function;
+import java.util.function.Predicate;
+
+class Employee {
+    String name;
+    double salary;
+    int age;
+
+    public Employee(String name, double salary, int age) {
+        this.name = name;
+        this.salary = salary;
+        this.age = age;
+    }
+}
+
+public class FunctionInterface2 {
+
+    public static void main(String[] args) {
+        //Takes sal and exp, calculate bonus and give it
+        Employee e1 = new Employee("Appu1", 51000, 46);
+
+        Function<Employee, Integer> f1 = e ->
+        {
+            int age = e.age;
+            double salary = e.salary;
+            if (age > 20 && age <= 30) {
+                 return  200;
+            } else if (age > 30) {
+                return 600;
+            } else {
+                return 100;
+            }
+        };
+        System.out.println("Bonus is: "+f1.apply(e1));
+
+        Predicate<Integer> p=i->i>500;
+        if(p.test(f1.apply(e1)))
+        {
+            System.out.println("Employee of the Month");
+        }
+        else
+        {
+            System.out.println("Not Eligible");
+        }
+
+    }
+}
+
+
+Ex: Combining two Function 
+andThen()
+compose() : Reverse order of andThen
+
+public class FunctionInterface3 {
+    public static void main(String[] args) {
+        Function<Integer,Integer> f1=i->i+i;
+        Function<Integer,Integer> f2=i->i*i;
+
+        System.out.println(f1.andThen(f2).apply(5)); //100
+        System.out.println(f1.compose(f2).apply(5)); //50
+    }
+}
+
+Consumer Interface
+------------------
+AM:accept()
+Accept any type of one value and process it and not return any value
+Ex:
+public class ConsumerInterface1 {
+    public static void main(String[] args) {
+        Consumer<String> c=s-> System.out.println(s);
+        c.accept("Appu");
+    }
+}
+
+Ex:
+Function: Returns bonus based on age
+Predicate: Check is Bonus greater than 500
+Consumer: Prints the value
+
+package consumersupplier;
+
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
+
+class Employee {
+    String name;
+    double salary;
+    int age;
+
+    public Employee(String name, double salary, int age) {
+        this.name = name;
+        this.salary = salary;
+        this.age = age;
+    }
+}
+
+
+public class FunctionPredicateConsumerInterface {
+    public static void main(String[] args) {
+
+        Employee e1 = new Employee("Appu1", 51000, 26);
+        Employee e2 = new Employee("Appu2", 70000, 36);
+        Employee e3 = new Employee("Appu3", 30000, 46);
+
+        Employee[] emp = {e1, e2, e3};
+
+        for (Employee x : emp) {
+            Function<Employee, Integer> f = e ->
+            {
+                if (e.age < 30) {
+                    return 400;
+                } else {
+                    return 1000;
+                }
+            };
+            Predicate<Integer> p = b -> b >= 500;
+            Consumer<Boolean> c = s -> System.out.println(s);
+
+            c.accept(p.test(f.apply(x)));
+        }
+
+    }
+}
+
+
+Java Streams
+============
+To store multiple Object we use Collection, To Process data present inside the Collection we use Streams.
+Take data from the Collection and store it into the Streams, Now process[Perform operation] data present in the Stream. Original data present in the Collection will not be affected.
+Streams contains collection of elements/Processed data of the Collection.
+
+Package: java.util.*;
+
+Mechanism/Methods in Streams:
+filter()
+map()
+
+filter()
+-------
+Based on some condition filter the data present in the Stream[Collection->Stream] and store the resultant in another collection or use it directly.
+Ex: Get even no from Collection
+Resultant data can be reduced
+Takes Predicate as a Parameter
+
+map()
+-----
+Get each and every element from Stream [Collection->Stream] and do some operation on those elements.
+Ex: Add 5 to all the elements in the Collection
+Resultant data will not be reduced
+Takes Function as parameter
+
+Collection -->data--->Streams<---map()/filter()
+
+sorted()
+--------
+To sort the data present in Stream before Processing or after Processing[map//filter]
+
+count()
+--------
+To count the data present in Stream after Processing[map//filter]
+
+collect()
+---------
+After processing[map//filter] data present in the Streams, to store those new processed data into another Collection
+
+distinct()
+----------
+To get unique data present in Stream after Processing[map//filter]
+
+foreach()
+---------
+To read each and every element from the Stream
+
+min() max()
+-----------
+To find min and max value from Stream
+
+Note: Always use Lambda exp while processing the data[map/filter/sorted/count/min/max/...]
+
+
+Note:
+Predicate VS Function
+Function: Take any type of input, Process and return any type of response
+Predicate: take any type of input, Check condition and return Boolean response
+
+
+Process to use Streams with Filter method
+-----------------------------------------
+To filter data based on some condition present in the Collection we use Stream with Filter
+
+Ex 1: 
+Create a Collection and add all the elements into it
+Take those Elements from Collection and put it into Stream using stream()
+Apply filter() to filter data based on some condition on the data present in the Stream
+Add those elements into Collection using collect()
+
+public class EvenNumberListUsingFilter {
+    public static void main(String[] args) {
+        List<Integer> originalData=Arrays.asList(2,3,4,5,6,7,8,0);
+        List<Integer> evenNumberList=new ArrayList<Integer>();
+        evenNumberList=originalData.stream().filter(n->n%2==0).collect(Collectors.toList());
+
+    }
+}
+
+public class NameLengthCheckUsingFilter {
+    public static void main(String[] args) {
+        List<String> originalData= Arrays.asList("appu","shivaraj","raghavendra rajkumar","dharshan","sudeep");
+        Set<String> modifedNumberList=new HashSet<String>();
+
+        modifedNumberList= originalData.stream().filter(s->s.length()>3 && s.length()<7).collect(Collectors.toSet());
+        System.out.println(modifedNumberList);
+    }
+}
+
+
+Ex 2: 
+Create a Collection and add all the elements into it
+Take those Elements from Collection and put it into Stream using stream()
+Apply filter() to filter data based on some condition on the data present in the Stream
+Iterate all the elements present in the Stream after processing and print it using forEach() and Consumer
+
+public class EvenNumberListUsingFilter {
+    public static void main(String[] args) {
+        List<Integer> originalData=Arrays.asList(2,3,4,5,6,7,8,0);
+        originalData.stream().filter(n->n%2==0).forEach(n-> System.out.println("Even No is: "+n));
+
+OR
+        originalData.stream().filter(n->n%2==0).forEach(System.out::println);
+    }
+}
+
+public class NameLengthCheckUsingFilter {
+    public static void main(String[] args) {
+        List<String> originalData= Arrays.asList("appu","shivaraj","raghavendra rajkumar","dharshan","sudeep");
+        originalData.stream().filter(s->s.length()>3 && s.length()<7).forEach(System.out::print);
+
+    }
+}
+
+Ex 3:
+Filter null values from the Collection
+
+public class NotNullCheckWithFilter {
+    public static void main(String[] args) {
+        List<String> originalData= Arrays.asList("appu","shivaraj",null,"dharshan",null,"sudeep");
+        originalData.stream().filter(s->s!=null).forEach(s-> System.out.println(s));
+    }
+}
+
+Ex 4: Filetr and Stream on Object data
+
+package streams;
+
+import java.util.ArrayList;
+import java.util.List;
+
+class Products
+{
+    String name;
+    int price;
+    int exp;
+
+    Products(String name,int price,int exp)
+    {
+        this.name=name;
+        this.price=price;
+        this.exp=exp;
+    }
+}
+public class ObjectProcessingUsingFilter {
+    public static void main(String[] args) {
+        Products p1=new Products("MysoreSandal",50,2023);
+        Products p2=new Products("Lux",30,2026);
+        Products p3=new Products("Colgate",40,2020);
+        Products p4=new Products("Vim",10,2025);
+
+        List<Products> prod=new ArrayList<Products>();
+        prod.add(p1);
+        prod.add(p2);
+        prod.add(p3);
+        prod.add(p4);
+
+        prod.stream().filter(p->p.exp>=2024).forEach(p-> System.out.println("Product "+p.name+" price is: "+p.price));
+
+    }
+}
+
+
+
+Process to use Streams with Map method
+--------------------------------------
+To process data[Perform some operation] present in the Collection we use Stream with Map
+
+Ex 1: 
+Create a Collection and add all the elements into it
+Take those Elements from Collection and put it into Stream using stream()
+Apply map() to process data based on some logic on the data present in the Stream
+Add those elements into Collection using collect()
+
+public class MapWithStream {
+    public static void main(String[] args) {
+        List<String> originalData= Arrays.asList("appu","shivaraj","dharshan","sudeep");
+        List<String> modifedData=new ArrayList<String>();
+
+        modifedData=originalData.stream().map(s->s.toUpperCase()).collect(Collectors.toList());
+        System.out.println(modifedData);
+
+    }
+}
+
+Ex 2: 
+Create a Collection and add all the elements into it
+Take those Elements from Collection and put it into Stream using stream()
+Apply map() to filter data based on some condition on the data present in the Stream
+Iterate all the elements present in the Stream after processing and print it using forEach() and Consumer
+
+public class MapwithStreamWithConsumer {
+    public static void main(String[] args) {
+        List<String> originalData= Arrays.asList("appu","shivaraj","dharshan","sudeep");
+
+        originalData.stream().map(s->s.length()).forEach(s->System.out.println(s));
+    }
+}
+
+
+Ex 3:
+public class MapwithStreamWithCOnsumer2 {
+    public static void main(String[] args) {
+        List<Integer> list= Arrays.asList(2,3,4,5);
+        list.stream().map(n->n*5).forEach(System.out::println);
+    }
+}
+
+Ex 4:
+Map with Filter
+
+public class MapWithFiletrWithStream {
+    public static void main(String[] args) {
+        List<String> originalData= Arrays.asList("appu","shivaraj","dharshan","sudeep");
+
+        originalData.stream().map(s->s.length()).filter(s->s<5).forEach(System.out::println);
+    }
+}
+
+
+Ex:
+Collection>Stream>Filter>Map>New Collection
+
+package streams;
+
+import java.util.ArrayList;
+import java.util.List;
+
+class Employee
+{
+    String name;
+    int salary;
+    Employee(String name,int salary)
+    {
+        this.name=name;
+        this.salary=salary;
+    }
+}
+public class CollStreamFilterMapColl {
+    public static void main(String[] args) {
+        Employee e1=new Employee("Appu1",20000);
+        Employee e2=new Employee("Appu2",90000);
+        Employee e3=new Employee("Appu3",10000);
+        Employee e4=new Employee("Appu4",50000);
+        Employee e5=new Employee("Appu5",40000);
+
+        List<Employee> list=new ArrayList<Employee>();
+        list.add(e1);
+        list.add(e2);
+        list.add(e3);
+        list.add(e4);
+        list.add(e5);
+
+        System.out.println("FILTER");
+        list.stream().filter(s->s.salary>25000).forEach(s-> System.out.println(s.name+" "+s.salary));
+        System.out.println("MAP");
+        list.stream().map(s->s.salary=s.salary+5000).forEach(m-> System.out.println(m));
+        System.out.println("FILTER MAP");
+        list.stream().filter(s->s.salary>25000).map(s->s.salary=s.salary+5000).forEach(s-> System.out.println(s));
+
+    }
+}
+
+
+OUTPUT:
+FILTER
+Appu2 90000
+Appu4 50000
+Appu5 40000
+MAP
+25000
+95000
+15000
+55000
+45000
+FILTER MAP
+100000
+60000
+50000
+
+
+Process to use Streams with FlatMap method
+------------------------------------------
+To Process complex collection[Collection having multiple collection] we se flatmap
+Map works for Collection, If its complex Collection then need to go for flat map
+
+Ex:
+public class FlatMapDemo1 {
+    public static void main(String[] args) {
+        List<Integer> list1 = Arrays.asList(1, 2);
+        List<Integer> list2 = Arrays.asList(3, 4);
+        List<Integer> list3 = Arrays.asList(5, 6);
+
+        List<List<Integer>> list4 = Arrays.asList(list1, list2, list3);
+
+        List<Integer> list5 = list4.stream().flatMap(x -> x.stream()).collect(Collectors.toList());
+        System.out.println(list5);
+
+
+    }
+}
+
+OUTPUT:
+[1, 2, 3, 4, 5, 6]
+
+E 2:
+public class FlatMapDemo1 {
+    public static void main(String[] args) {
+        List<Integer> list1 = Arrays.asList(1, 2);
+        List<Integer> list2 = Arrays.asList(3, 4);
+        List<Integer> list3 = Arrays.asList(5, 6);
+
+        List<List<Integer>> list4 = Arrays.asList(list1, list2, list3);
+
+
+       // List<Integer> list5 = list4.stream().flatMap(x -> x.stream()).collect(Collectors.toList());
+      //  System.out.println(list5);
+        List<Integer> list5 = list4.stream().flatMap(x -> x.stream().map(y->y+100)).collect(Collectors.toList());
+        System.out.println(list5);
+
+
+    }
+}
+
+OUTPUT:
+[101, 102, 103, 104, 105, 106]
+
+Terminal/ Non terminal Function of Streams
+------------------------------------------
+Collection-->Stream--->map()/filter()/flatMap()/distinct()/limit()[Non Terminal Function]--->min()/max()/count()/forEach()/collect()/toArray()/reduce()/collect()[Terminal Function]
+
+Ex 1:FOREACH/DISTINCT/COUNT/LIMIT
+package streams2;
+
+import java.lang.reflect.Array;
+import java.util.Arrays;
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class TerminalStreamFunctionDemo1 {
+    public static void main(String[] args) {
+
+        List<String> list= Arrays.asList("bus","car","van","bus","van");
+
+        System.out.println("********FOREACH********");
+        list.stream().forEach(System.out::println);
+
+        System.out.println("********DISTINCT********");
+        list.stream().distinct().forEach(System.out::println);
+
+        System.out.println("******COUNT**********");
+        long c=list.stream().distinct().count();
+        System.out.println("Distinct Count is: "+c);
+
+        System.out.println("******LIMIT**********");
+        list.stream().limit(2).forEach(System.out::println);
+        List set=list.stream().limit(4).collect(Collectors.toList());
+        System.out.println("Size is: "+set.size());
+
+
+    }
+}
+
+OUTPUT:
+********FOREACH********
+bus
+car
+van
+bus
+van
+********DISTINCT********
+bus
+car
+van
+******COUNT**********
+Distinct Count is: 3
+******LIMIT**********
+bus
+car
+Size is: 4
+
+Ex 2:MIN and MAX
+To find min and max value avl in stream
+package streams2;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
+public class CountMinMaxInStreamDemo2 {
+    public static void main(String[] args) {
+        List<Integer> list = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 0);
+
+        System.out.println("*****COUNT************");
+        long evenCount = list.stream().filter(x -> x % 2 == 0).count();
+        System.out.println("Even no count is: "+evenCount);
+
+        System.out.println("*****MIN************");
+        Optional<Integer> min = list.stream().min((val1, val2) ->
+        {
+            return val1.compareTo(val2);
+        });
+        System.out.println("Min value is: "+min.get());
+
+        System.out.println("*****MAX************");
+        Optional<Integer> max = list.stream().max((val1, val2) ->
+        {
+            return val1.compareTo(val2);
+        });
+        System.out.println("Max value is: "+max.get());
+    }
+}
+
+
+OUTPUT:
+*****COUNT************
+Even no count is: 5
+*****MIN************
+Min value is: 0
+*****MAX************
+Max value is: 8
+
+Ex 3:reduce
+Used to reduce list of value avl in Stream into single value by adding or concatenating
+input: 1 2 3 a b c
+output: 123abc
+
+public class reducedemo {
+    public static void main(String[] args) {
+        List<String> list= Arrays.asList("a","b","1","c","d","3");
+       Optional<String> reducedResult=list.stream().reduce((value, combinedvalue)->
+        {
+           return value+combinedvalue;
+        });
+
+        System.out.println("Final Combined Result is: "+reducedResult.get());
+    }
+}
+
+ex:
+public class reducedemo2 {
+    public static void main(String[] args) {
+
+        List<Integer> list= Arrays.asList(1,2,3,4,5,6);
+        Optional<Integer> reducedResult=list.stream().reduce((value, combinedvalue)->
+        {
+            return value+combinedvalue;
+        });
+
+        System.out.println("Final Combined Result is: "+reducedResult.get());
+    }
+    }
+
+OUTPUT:
+Final Combined Result is: 21
+
+Ex: Convert value present in the Stream to Array
+public class ToArrayWithStream {
+    public static void main(String[] args) {
+        List<String> list= Arrays.asList("a","b","1","c","d","3");
+        Object arr[]=list.stream().toArray();
+        System.out.println(arr);
+        System.out.println(arr.length);
+
+    }
+}
+
+OUTPUT:
+[Ljava.lang.Object;@7ba4f24f
+6
+
+Ex 4: sorted()
+Used to sort any type of elements inside the Stream in asc or desc order
+public class SortedInStreams {
+    public static void main(String[] args) {
+
+        System.out.println("****SORTED********");
+        List<String> list= Arrays.asList("a","b","1","c","d","3");
+        list.stream().sorted().forEach(System.out::println);
+        list.stream().sorted(Comparator.reverseOrder()).forEach(System.out::println);
+    }
+}
+
+OUTPUT:
+****SORTED********
+13abcd
+dcba31
+
+Ex 5: anyMatch()
+Checks whether specified data[condition] is matching with any one of the Stream data , if any one matches then it returns true else false. 
+Any match takes Predicate as arguement[condition] nd returns Boolean as output
+ex: 
+Stream has: one apple, one mango, two apple ,three mango
+
+Specified data: starts with one
+one apple, one mango both starts with one so it returns true
+
+Specified data: contains five
+none of the elements in stream contains five so it returns false
+
+boolean status=list.stream().anyMatch(s->s.contains("one"));
+
+Ex:
+public class AnyMatchDemo {
+    public static void main(String[] args) {
+        List<String> list= Arrays.asList("two mango","","one elephant","one orange","five apple");
+
+        boolean status=list.stream().anyMatch(s->s.startsWith("one"));
+        System.out.println("Result is: "+status);
+    }
+}
+
+OUTPUT:
+Result is: true
+
+public class AnyMatchDemo {
+    public static void main(String[] args) {
+        List<String> list= Arrays.asList("two mango","","one elephant","one orange","five apple");
+
+        //boolean status=list.stream().anyMatch(s->s.startsWith("one"));
+        boolean status=list.stream().anyMatch(s->s.endsWith("one"));
+        System.out.println("Result is: "+status);
+    }
+}
+
+OUTPUT:
+Result is: false
+
+Ex 6: allMatch()/noneMatch()
+All elements should match the condition
+None of the elements should match the condition
+
+
+Ex 7:findAny()/findFirst()
+Takes nothing as arguement
+Returns Optional class object as output
+
+Find any matching element
+Find first matching element
+
+Apply Filter and fetch first matching or any matching of the filtered result
+
+Usage Ex:returns first match string which length is greater than 10
+Check in list of Strings names, find any string or first matching string of specific length
+
+public class FindAnyFindFirstDemo {
+    public static void main(String[] args) {
+        List<String> list= Arrays.asList("two mango","","one elephant","one orange","five apple");
+        System.out.println(list.stream().filter(s->s.length()>10).findFirst().get());
+    }
+}
+
+OUTPUT:
+one elephant
+
+public class FindAnyFindFirstDemo {
+    public static void main(String[] args) {
+        List<String> list= Arrays.asList("two mango","","one elephant","one orange","five apple");
+        System.out.println(list.stream().filter(s->s.length()>10).findAny().get());
+    }
+}
+
+OUTPUT:
+one elephant
+
+
+ex 8:concat()
+Used to concat two streams into single stream
+
+public class StreamConcatDemo {
+    public static void main(String[] args) {
+        List<String> list1= Arrays.asList("two mango","","one elephant","one orange","five apple");
+        List<String> list2= Arrays.asList("a","b","1","c","d","3");
+        Stream<String> s1=list1.stream();
+        Stream<String> s2=list2.stream();
+
+        Stream<String> s3=Stream.concat(s1,s2);
+        s3.forEach(s-> System.out.print(s+" "));
+    }
+}
+
+
+
+OVERVIEW:
+=========
+Collection->Stream->Non Terminal Function[Processing]->Terminal Function
+
+Non Terminal Function:filter/map/flatmap/distinct/limit
+Terminal Function: min/max/reduce/toArray/forEach/count/collect
+
+Terminal opearation can be applied directly to stream or after applying non terminal operation w can apply terminal opearation on it
+
+Collection->Stream->Non Terminal Function[Processing]->Terminal Function
+OR
+Collection->Stream->Terminal Function
+
+To be Known:
+filter/map/flatmap/distinct
+count/collect/foreach
+

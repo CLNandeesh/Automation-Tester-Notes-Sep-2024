@@ -1,0 +1,67 @@
+P1: To count occurrence of each character in a string
+=====================================================
+public class LettersInname {
+    public static void main(String[] args) {
+        String str = "Punith Rajkuamr";
+        String str2 = str.replace(" ", "");
+        Map<Character, Integer> map = new HashMap<>();
+
+        char[] ch = str2.toCharArray();
+        for (char c : ch) {
+            int i = 0;
+            if (map.containsKey(c)) {
+                map.put(c, map.get(c) + 1);
+            } else {
+                map.put(c, 1);
+            }
+        }
+        System.out.println(map);
+    }
+}
+
+OUTPUT:
+{P=1, a=2, R=1, r=1, t=1, u=2, h=1, i=1, j=1, k=1, m=1, n=1}
+
+P2: Accepts array and return sum of all the elements
+====================================================
+public class AcceptsArrayReturnSumOfAllTheElements {
+
+    public static void main(String[] args) {
+        //Method 1:
+        int a[]={2,3,4,5};
+        int sum=0;
+        for(int i:a)
+        {
+            sum=sum+i;
+        }
+        System.out.println("Sum of elements is: "+sum);
+    }
+}
+
+OUTPUT:
+Sum of elements is: 14
+
+P3: Print 5 multiplication table without using multiplication Operator 
+======================================================================
+Ex: 
+Input 5,10
+Output: 50
+
+public class Print5MultiplicationTableWithoutUsingMultiplicationOperator {
+    public static void main(String[] args) {
+        System.out.println("Result is: " + function1(5, 10));
+    }
+
+    public static int function1(int a, int b) {
+        int result = 0;
+        for (int i = 0; i < b; i++) {
+            result = result + a;
+        }
+        return result;
+    }
+}
+
+OUTPUT:
+Result is: 50
+
+

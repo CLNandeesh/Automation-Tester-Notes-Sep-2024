@@ -1,0 +1,83 @@
+https://admhelp.microfocus.com/lr/en/2023-2023-r1/help/WebHelp/Content/Controller/UI_edit_action_db.htm?cshid=240053
+
+Recording Setting
+Record with Action, Transaction and Comments
+Parameterization
+Correlation
+Checkpoints
+Conversions[LR<->C]
+RTS Setting
+Execution
+WLM
+
+
+STEP 1:Recording option setting
+-------------------------------
+In recording option
+ Click on record>Recording options link
+
+setup 1:General->Recording>HTTP based scripts->HTML Advance>Select second option in both 
+	This will record only main web requests with all necessary web resources
+
+setup 2:HTTP Properties>Advance>Disable Replace pass with enc parameters
+
+setup 3: Mapping and Filtering>Select Socket level data dropdown
+
+STEP 2: Create Actions, Transactions, Comments and Record the script
+--------------------------------------------------------------------
+->Create required separate actions and record the script in respective actions only by providing transaction names and comments during recording time itself.
+->After recording in Recording report, Check if only required domain has been recorded or not, else remove un necessary domain and re generate the script once.
+
+Step 3: Parameterization
+------------------------
+->Click on Parameters tab
+->Click on New
+->Provide LR Param name
+->Specify the dat file where data exists.
+->If there are other LR params, refers to same file then specify same file path for other LR params and also specify which column to refer[Column number or name]
+->Use the LR param in the script where ever needed {LRParam}
+ 
+Note: 
+->To do any modification need to convert to C and do
+->Any number of dat file can be created for one script
+
+
+
+
+Required LR and C Functions:
+//To print any message
+lr_output_message("*****Booking Flight Execution Started*****");
+
+//To add start and end transactions
+lr_start_transaction("Launch");
+lr_end_transaction("Launch",LR_AUTO);
+lr_end_transaction("Launch",LR_PASS);
+lr_end_transaction("Launch",LR_FAIL);
+
+//LR to C Conversion
+char *c=lr_eval_string("Appu {uName}"); 
+char *c=lr_eval_string("{uName}"); 
+int i=atoi(lr_eval_string("{lrParamName}");  
+	
+//C to LR
+lr_param_sprintf("lrParamName","format specifier",cVarName); //appu 200202022
+
+//To print C var
+lr_output_mesage("format specifier",cVariableName);
+
+//To print LR Param var
+convert to c and print
+int a=atoi(lr_eval_string("{lrParam}"));
+lr_output_mesage("%d",a);
+
+
+Note:
+->LR Param can be directly used in script but C var cannot be used directly in the script. Need to be converted to LR param before using in the script.
+->To perform any operation, LR param need to be converted to C. 
+->Always create the scripts in Vugen, execute it with multiple users[different creds/parameterization] for multiple iteration[correlation] so to make sure all parameterization and correlation is working fine.
+
+Script Names||Single iteration||Multiple Iteration||Multiple iteration with multiple users[creds different]||Final status
+Book flight    pass              pass               pass                                                       PASS
+Cancel flight  pass              pass               pass                                                       PASS
+
+

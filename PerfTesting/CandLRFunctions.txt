@@ -1,0 +1,160 @@
+C Functions
+===========
+1. atoi()
+->Used to convert LR Param to C integer type value
+
+int a;
+a=atoi(lr_eval_string("{age}")); //age is of type string
+lr_output_message("AGE is: %d",a);
+lr_output_message("AGE is: %d",a+10);
+
+Output is of type integer
+
+2. itoa()
+->Integer C to String C conversion
+
+Ex:
+int a=10;
+char c[100]; //should be declared as array not pointer
+itoa(a,c,10);  //c contains string value of 10
+10: base 10
+
+3. sprint()
+->Integer C to String C conversion
+
+Ex 1:
+int a=10;
+char c[100]; //should be declared as array not pointer
+sprint(c,"%d",a); //c contains string value of 10
+
+Ex 2:
+int a=10;
+int b=2.5;
+char c[100]; //should be declared as array not pointer
+sprint(c,"%d %f",a,b); //c contains string value of 10 2.5
+
+LR Functions
+============
+
+1. lr_output_message()
+->To print data on console
+
+Syntax:
+lr_output_message("Any text");
+
+Ex:
+int result=10;
+lr_output_message("Result is: %d",result); //Result is: 10
+lr_output_message("Welcome"); //Welcome
+
+2. lr_param_sprintf()
+->C to LR Param Conversion
+
+Syntax:
+lr_param_sprintf("lrParamvariableName","formatSpecifier",cVariableName);
+
+Ex:
+float f=1.23;
+lr_param_sprint("pival","%f",f); //Now LR Param pival contains C var value 1.23
+
+Ex: Combination of float, int and string to LR Parameter
+int a=100;
+float b=1.25;
+char *c="Aquaman";
+lr_param_sprintf("moviedetails","%d tickets for %s movie each ticket costs %.2f",a,c,b); ////Now LR Param moviedetails contains a,b,c variable values
+
+3. lr_eval_string()
+->LR Param to C conversion, output type will be of string [char *c]
+
+Syntax:
+C variable of type string=lr_eval_string("{LRParamVariableName}");
+
+Ex:
+char *str;
+str=lr_eval_string("{LR_param}");
+lr_output_message("C value is %s ",str); 
+
+Ex:
+str2=lr_eval_string("{LR_param} is new value");
+
+Ex:
+Ex:
+lrparam1="appu";
+lrparam2="good boy";
+char *s=lr_eval_string("{lrparam1} is {lrparam2}");
+
+4. lr_start_transaction()/lr_end_transaction();
+
+Ex:
+lr_start_transaction("Launch")
+lr_end_transaction("Launch",LR_FAIL);
+lr_end_transaction("Launch",LR_PASS);
+lr_end_transaction("Launch",LR_AUTO);
+
+
+5. web_set_max_html_param_len("1000");
+//To set max length of LR Param
+web_set_max_html_param_len("1000");
+To be added at beginning only
+Applied to all LR param used in script
+
+
+
+Recording Option
+Record
+RTS 
+Text checkpoints
+Error handling
+Parameterization
+Correlation
+Conversion[C to LR/LR to C]
+
+https://admhelp.microfocus.com/vugen/en/2023-2023-r1/help/function_reference/Content/FuncRef/web/examples/lrFuncRef_WVF_W_gt_iprop_Example.htm?Highlight=web_get_int_property
+
+scripting challenges
+====================
+dynamic request creation
+download validation
+
+dynamic user name creation 
+  Create LR param with Date option
+  Store with Some string and store into C var
+  Convert C to LR param and use
+
+Ex:
+LR Param name: uName with date 
+200202022
+
+//LR to C
+char *c=lr_eval_string("Appu {uName}"); 
+char *c=lr_eval_string("{uName}"); 
+int i=atoi(lr_eval_string("{lrParamName}");  
+	
+//C to LR
+lr_param_sprintf("lrParamName","format specifier",cVarName); //appu 200202022
+
+//To print C var
+lr_output_mesage("format specifier",cVariableName);
+
+//To print LR Param var
+convert to c and print
+int a=atoi(lr_eval_string("{lrParam}"));
+lr_output_mesage("%d",a);
+
+Ex:
+web_reg_save_param_ex(
+"ParamName=cDepartureCity",
+"LB=<option value=\"",
+"RB=\">",SEARCH_FILTERS,LAST);
+
+dCity=lr_eval_string("{cDepartureCity}");
+lr_output_message("Departure city is: %s",dCity);
+
+Help 
+F1
+
+//Correlation fucntions
+web_reg_save_param_regex() //ParamName,Regex Expression
+web_reg_save_param_ex() //ParamName,LB,RB
+web_reg_save_param() //ParamName,LB,RB
+

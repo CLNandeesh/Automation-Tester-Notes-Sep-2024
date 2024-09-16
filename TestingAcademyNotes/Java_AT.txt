@@ -1,0 +1,385 @@
+https://github.com/PramodDutta/LearningATB7xJavaPrograms/tree/main
+
+Features
+========
+Simple/Object Oriented/Platform Independent/Portable/Robust/Secure/Interpreted/Multi Threaded
+
+Source code[.java]>Byte code[.class file][JVM understandable code]
+
+Execution of Java code
+=======================
+Compiler: Converts .java file to .class file at once during compilation time.
+JVM: Translates .class file to native specific code[based on OS] and execute[JIT] it line by line during runtime.[Interpreter]
+
+JDK VS JRE VS JVM
+=================
+JDK: Tool kit having both JRE and JVM
+JRE: Run time env to execute Java program
+JVM: Used to execute Java program
+     
+Memory in JVM
+Stack
+Heap
+Method
+Register
+
+Stable version of JDK:21
+Company: Open JDK or Oracle JDK
+
+Comments
+========
+//
+/*
+
+*/
+
+Main method
+===========
+Entry point for the program, recognized and exe by JVM.
+JVM identify main having standard syntax
+Class without main method cannot be executed
+static public allowed
+main method can be overloaded
+
+Keywords and Identifiers
+========================
+Keywords: Reserve words which has pre defined functionality and can be used in the programs.
+Ex: for int char
+
+Identifiers: Name given to variables, methods, class, interface, ....
+Rules:
+Starts with Letters or _ or $
+No Keywords can be used
+Can contain letters, digits, _ and $
+No space, can be used _
+Meaning full
+
+Variables and Data types
+=========================
+Containers to store the values
+Type of data
+ Primitive: Cannot be broken
+       Bolen Types: boolean
+       Numeric
+          Integral: byte[1], short[2], int[4], long[8], char[2]
+          Floating point: float[4], double[8]
+ Non Primitive: Can be broken
+          Class[String], Interface, Enum, Annotation type
+
+0b/0O/0X
+
+Variable Types
+Local/Instance/Static
+
+Constants
+=========
+final int a=100; //Value cannot be changed
+
+Operators
+=========
+Assignment Operator: =
+Compound Assignment Operator:a=a+10; a+=10;
+Unary Operator:- +
+Arithmetic Operator:+ - * / %
+Relational Operator:> < <= >= == != !
+Logical Operator: ! || &&
+Equality operator: == !=
+Bitwise Operator: | & 
+Ternary Operator: ?:
+Inc and Dec Operator: ++ --
+
+Ternary Operator
+int large=(40>20)?40:20;
+
+byte>short>int>long>float>double
+           char
+
+Type Casting
+============
+Converting data of one type to another type
+Type checking is done by Compiler at compilation time, Type casting is done by JVM at runtime
+
+Primitive data type casting
+Implicit[widening]: Internally done by JVM at run time
+Explicit[narrowing]: Need to do manually using cast operator
+int a=100;
+byte b=(byte) a;
+
+String
+======
+Sequence of characters
+Immutable in nature, new object will be created to store modified content if we modify existing content
+
+String str="appu"; //SCP
+String str=new String("appu"); //Heap and SCP, In SCP no duplicate allowed
+
+str.toLower("")/str.toUpper("")/str.chatAt(index)
+
+String s1=new String ("Appu"); //Heap[Allow duplciates] and SCP
+String s2="Appu"; //SCP , No Duplicates
+
+Ex: No Duplicates allowed in SCP
+String s1="appu";
+String s2="appu";
+s1==s2 //true
+s1.equals(s2); //true
+One object storing appu and both s1 s2 points to it
+
+Ex: Duplicates allowed in Heap
+String s1=new String("appu");
+String s2="new String("appu");
+s1==s2 //false
+s1.equals(s2); //true
+Two object will be created and s1 and s2 points to its respective memory location
+
+Ex:== Ref value comparision, equals is used for content compariaion
+
+Ex:
+        String s1="Appu";
+        System.out.println(s1);
+        System.out.println(s1.hashCode());
+        s1.concat("raj");
+        System.out.println(s1);
+        System.out.println(s1.hashCode());
+        s1=s1.concat("raj"); //new obj is created to store modified content
+        System.out.println(s1);
+        System.out.println(s1.hashCode());
+
+OUTPUT:
+Appu
+2047636
+Appu
+2047636
+Appuraj
+871694599
+
+Condition Statements
+====================
+if(cond)
+{---}
+
+if(cond)
+{--}
+else
+{---}
+
+if(cond)
+{---}
+else if(cond)
+{---}
+else
+{---}
+
+Scanner sc=new Scanner(System.in);
+int a=sc.nextInt();
+sc.close();
+
+Math.max(num1.num2);
+
+Switch
+======
+Exp: byte, short, int, long, enum, string
+Case value: constants, literals, Variables not allowed
+If break not provided then all the case statements will be executed
+
+Syntax:
+switch(exp)
+{
+case value1:
+  stm;
+  break;
+
+case value1:
+  stm;
+  break;
+
+default:
+  stm;
+
+}
+
+Ex:
+public class SwitchDemo {
+
+    public static void main(String[] args) {
+        Scanner sc=new Scanner(System.in);
+        System.out.println("Enter number between 1 to 3");
+
+        int num=sc.nextInt();
+
+        switch(num)
+        {
+            case 1:
+                System.out.println("ONE");
+               break;
+
+            case 2:
+                System.out.println("TWO");
+               break;
+
+            case 3:
+                System.out.println("THREE");
+                break;
+            default:
+                System.out.println("INVALID DATA");
+
+
+        }
+    }
+}
+
+
+JDK >13
+Supports multiple condition
+
+switch(exp)
+{
+case val1,val2,val3:
+stm;
+break;
+
+.
+.
+.
+}
+
+Ex:
+public class SwitchDemo {
+
+    public static void main(String[] args) {
+        Scanner sc=new Scanner(System.in);
+        System.out.println("Enter number between 1 to 3");
+        int num=sc.nextInt();
+
+        switch(num)
+        {
+            case 1,4,5:
+                System.out.println("ONE");
+               break;
+
+            case 2:
+                System.out.println("TWO");
+               break;
+
+            case 3:
+                System.out.println("THREE");
+                break;
+            default:
+                System.out.println("INVALID DATA");
+
+
+        }
+    }
+}
+
+Ex: Switch with Arrow Operator
+No Break is needed
+
+public class SwitchWithArrow {
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Enter number between 1 to 3");
+        int num = sc.nextInt();
+
+        switch (num) {
+            case 1, 4, 5->System.out.println("ONE");
+            case 2->System.out.println("ONE");
+            case 3->System.out.println("ONE");
+            default->System.out.println("INVALID DATA");
+
+        }
+    }
+}
+
+Ex: Switch with Arrow function and multiple condition to predict Vowels
+
+public class SwithToPredictVowels {
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Enter the character");
+        char input = sc.next().charAt(0);
+
+        switch (input) {
+            case 'a','e','i','o','u'->System.out.println("VOWELS");
+            default->System.out.println("NOT A VOWELS");
+        }
+    }
+}
+
+Ex: Switch can return value using yield keyword
+
+public class SwitchReturningvalue {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Enter the character");
+        int input = sc.nextInt();
+        //char input = sc.next().charAt(0);
+
+        int val=switch(input)
+        {
+            case 1,2,3,4,5:
+                yield 65;
+
+            default:
+                throw new IllegalStateException("Unexpected value: " + input);
+        };
+        System.out.println("Returned Value is: "+val);
+    }
+}
+
+LOOPS
+======
+for/while/do while
+
+for
+supports char, byte, short, int, float, long ,double data type
+
+for(int;cond;inc/dec)
+{
+stm;
+}
+
+ex:
+public class ForloopDemo {
+    public static void main(String[] args) {
+        System.out.println("Before LOOP");
+
+        for(int i=0;i<5;i++)
+        {
+            System.out.println("Value is: "+i);
+            System.out.println("Inside Loop");
+        }
+
+        System.out.println("After LOOP");
+    }
+}
+
+break and continue can be used inside the loops.
+
+ini
+while(cond)
+{
+stm;
+inc/dec;
+}
+
+ini
+do 
+{
+stm;
+inc/dec;
+}while(cond);
+
+Functions
+=========
+Function wo Parameter and no Return type
+Function with Parameter and no Return type
+Function wo Parameter and with Return type
+Function with Parameter and with Return type
+
+Arrays
+======
+
+

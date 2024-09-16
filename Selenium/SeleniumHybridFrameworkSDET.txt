@@ -1,0 +1,1538 @@
+Selenium Hybrid Automation Framework
+====================================
+->Objective
+->Types of Framework
+->Phases or Stages
+->AUT
+->Components
+->Framework Creation Steps 
+	Step 1: Create maven project add dependency
+	Step 2: Create Project Structure
+	Step 3: Implementation of POC , Base Class and Test case class
+		3.1 Create Base Page class
+		3.2 Create Page Object class
+		3.3 Create Test case class and methods
+		3.4 Create Base Class under test base package 
+	Step 4:Adding Logs
+	Step 5: Run Tests on Desired browser/Cross browser/Parallel testing
+		5.1: Desired browser testing
+		5.2: Cross Browser testing
+		5.3: Parallel testing with Cross browser
+	Step 6 Reading Common values from properties file
+	Step 7 Data driven Testing
+	Step 8: Grouping Test cases
+	Step 9: Add Extent reports
+	Step 10: Run failed test cases
+	Step 11: Running Test on Selenium Grid
+	Step 12: Docker integration with Selenium grid
+	Step 13: Execution using pom.xml file
+	Step 14: CI and CD 
+		Step 14.1: Push project to GitHub
+		Step 14.2: Run GitHub project using Jenkins
+->Overview and Blue print
+
+*********************************************************************************************************************************************************
+Objective of Framework
+======================
+->Modularity
+->Maintenance
+->Reusability
+
+*********************************************************************************************************************************************************
+Types of Framework
+==================
+Built In : 
+->Test Ng, Junit, Cucumber, ...
+
+Customized: 
+->Built In + Additional API
+->Data driver, Keyword driven, Hybrid framework
+
+*********************************************************************************************************************************************************
+Phases/Stages
+=============
+->Analysing AUT
+   No of pages
+   What are all the elements/How/Type
+   What to Automate/What we cannot Automate
+
+->Choose Test case for Automate
+   100 Test cases: 90 feasible for automation, then all 90 can be automated so its 100% automation.
+   Priority:
+       P1:Sanity TC 
+       P2:Data driven TC/ Re tests TC
+       P3:Regression TC
+       P4:Any other TC
+
+->Design and Development of Framework
+    Creating folder structure
+    Implementing TC
+
+->Execution
+    Local execution and Remote execution[Selenium grid, Jenkins]
+
+->Maintenance
+   Git and GitHub 
+  
+Maintenance and Execution
+    CI/CD: GitHub and Jenkins
+
+*********************************************************************************************************************************************************
+AUT
+===
+Domain: 
+  ECommerce 
+    Online shopping application
+    Ex: Amazon, Jio Mart, ...
+ 
+URL: https://demo.opencart.com/admin/
+
+*********************************************************************************************************************************************************
+Components
+==========
+Java: Programming language
+Selenium: Automation framework
+Test NG: Unit testing framework
+Maven: Build tool
+POM: Design pattern
+
+POM
+->Separate class for each page                            
+->Object Identification and Actions
+
+Test cases
+->Validation
+
+Test NG. xml
+->TC execution configuration[Grouping, Parallel browser execution,..]
+
+pom.xml
+->Dependency
+->Internally calls Testng.xml for execution
+
+Utilities
+->Frequent methods
+->XL Utilities
+->Data providers
+->Extend report
+->Screenshot 
+
+Test Data
+->Excel files
+
+Resources
+->Log4J
+->Properties
+
+Reports
+->TestNG
+->Extend Report
+
+Logs
+->Info, Debug, Warn
+->Log4j
+
+CI/CD
+->Git, GitHub and Jenkins
+
+*********************************************************************************************************************************************************
+Framework Creation Steps
+========================
+Step 1: Create maven project add dependency
+-------------------------------------------
+Ex:
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.appu</groupId>
+    <artifactId>SeleniumSDET</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+
+        <!-- SELENIUM-->
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>4.20.0</version>
+        </dependency>
+
+        <!-- TESTNG-->
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>7.10.2</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- COMMONS: For common utilities methods-->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.16.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.15.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-email</artifactId>
+            <version>1.6.0</version>
+        </dependency>
+
+        <!-- APACHE POI: For Excel activities-->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>5.3.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>5.3.0</version>
+        </dependency>
+
+        <!-- LOG4J: For Logs-->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>2.23.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.17</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j-impl</artifactId>
+            <version>2.23.1</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- EXTENT REPORT: For Reporting-->
+        <dependency>
+            <groupId>com.aventstack</groupId>
+            <artifactId>extentreports</artifactId>
+            <version>5.1.2</version>
+        </dependency>
+
+    </dependencies>
+</project>
+
+Step 2: Create Project Structure
+--------------------------------
+
+Step 3: Implementation of POC , Base Class and Test case class
+--------------------------------------------------------------
+3.1 Create Base Page class
+--------------------------
+->Create a BasePage class under pageobjects package
+->Contains Constructor to initialize Web elements of all the Page Object classes.
+
+Ex:
+public class BasePage {
+    WebDriver driver;
+    public BasePage(WebDriver driver) {
+        this.driver = driver;
+        PageFactory.initElements(driver, this);
+    }
+
+}
+
+3.2 Create Page Object class
+----------------------------
+->Create required Page Object Class under pageobjects package for all required pages and extends BasePage class 
+->Add Constructor containing super() to call parent class constructor
+->Identify Webelement using @FindBy annotation
+->Add Action methods
+
+public class HomePage extends BasePage {
+
+    public HomePage(WebDriver driver) {
+        super((driver));
+    }
+
+    @FindBy(xpath = "//span[text()='My Account']")
+    WebElement lnkMyAccount;
+
+    @FindBy(xpath = "//a[text()='Register']")
+    WebElement lnkRegister;
+
+    public void clickMyAccount() {
+        lnkMyAccount.click();
+    }
+
+    public void clickRegister() {
+        lnkRegister.click();
+    }
+
+}
+
+3.3 Create Test case class and methods
+--------------------------------------
+->Create Test case class under testcases package and extends BaseClass
+->Create Test methods to call POC action methods and to perform validations.
+
+Ex:
+public class TC01AccountRegistrationtest extends BaseClass{
+    @Test
+    void validateAccountRegistration() throws InterruptedException {
+
+        HomePage homePage = new HomePage(driver);
+        homePage.clickMyAccount();
+        homePage.clickRegister();
+
+        AccountRegistrationPage accountRegistrationPage = new AccountRegistrationPage(driver);
+        accountRegistrationPage.setFirstName("nandeesh");
+        accountRegistrationPage.setLastName("cl");
+        accountRegistrationPage.setEmail("nandeesh@gmail.com");
+        accountRegistrationPage.setPassword("Apjkalam!123");
+        accountRegistrationPage.agreePolicy();
+        accountRegistrationPage.clickContinue();
+        String actualMessage = accountRegistrationPage.getConfirmationMessage();
+        Assert.assertEquals(actualMessage, "Your Account Has Been Created!");
+    }
+}
+
+3.4 Create Base Class under testbase package 
+--------------------------------------------
+->Keep all setup, teardown and screenshot methods
+->All Test case class should extends this BaseClass
+
+Ex:
+public class BaseClass {
+    public static WebDriver driver;
+
+    @BeforeClass
+    void setup() throws InterruptedException {
+        driver = new ChromeDriver();
+        driver.manage().window().maximize();
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+        driver.get("https://demo.opencart.com/en-gb?route=account/register");
+    }
+
+    @AfterClass
+    void tearDown() {
+        driver.quit();
+    }
+}
+
+Step 4:Adding Logs
+------------------
+->Log Levels
+All<Trace<Debug<Info<Warn<Error<Fatal<Off
+
+->Appenders- Where to generate logs [Console/File] 
+->Loggers - What type of logs to generate[All<Trace<Debug<Info<Warn<Error<Fatal<Off]
+Above two should be updated in log4j2.xml file
+
+Steps:
+->Add dependency
+->Add log4j2.xml configuration file into src/test/resources folder ->log4j2.xml
+->Update BaseClass
+->In setup() load Log4j xml file
+public Logger logger;
+logger = LogManager.getLogger(this.getClass());
+
+->Add Log statements in required class
+log.info()
+log.debug()
+log.error()
+
+Packages:
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+Note: Loggers>Root level if we make Off then it wont generate any logs
+
+
+//What type of Logs and COnsole or File log setting to be made here
+    <Loggers>
+        <Root level="INFO">    //what type of log level needed
+            <!--<AppenderRef ref="Console"/>-->  //Do we need console logs
+            <AppenderRef ref="File"/>            //Do we need file logs
+        </Root>
+    </Loggers>
+
+//Location configurations
+    <Properties>
+        <Property name="log-path">./logs</Property>
+        <Property name="log-pattern">%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n</Property>
+    </Properties>
+
+Ex:log4j2.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="INFO">
+    <Properties>
+        <Property name="log-path">./logs</Property>
+        <Property name="log-pattern">%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n</Property>
+    </Properties>
+    
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${log-pattern}"/>
+        </Console>
+
+        <RollingFile name="File" fileName="${log-path}/automation.log"
+                     filePattern="${log-path}/automation-%d{MM-dd-yyyy}-%i.log.gz">
+            <PatternLayout pattern="${log-pattern}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="1MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10"/>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <Root level="INFO">
+            <!--<AppenderRef ref="Console"/>-->
+            <AppenderRef ref="File"/>
+        </Root>
+    </Loggers>
+</Configuration>
+
+
+
+Ex:
+package testcases;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+public class BaseClass {
+    public static WebDriver driver;
+    public Logger logger;
+    public Properties properties;
+
+    @BeforeClass
+    @Parameters({"os", "browser"})
+    void setup(String osName, String browserName) throws InterruptedException, IOException {
+        
+        //Logging
+        logger = LogManager.getLogger(this.getClass());
+
+        //Properties file reading
+        FileReader fileReader = new FileReader("./src//test//resources//config.properties");
+        properties = new Properties();
+        properties.load(fileReader);
+        String loginURL = properties.getProperty("url");
+
+        switch (browserName.toLowerCase()) {
+            case "chrome" -> driver = new ChromeDriver();
+            case "firefox" -> driver = new FirefoxDriver();
+            case "edge" -> driver = new EdgeDriver();
+            default -> {
+                System.out.println("Invalid Browser");
+                return;
+            }
+        }
+        driver.manage().window().maximize();
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+        System.out.println("URL is:" + loginURL);
+        driver.get(loginURL);
+    }
+
+}
+
+Ex: Test methods 
+public class TC02Logintest extends  BaseClass{
+
+    @Test(groups = {"sanity"})
+    void validateLoginWithValidCredentials() throws InterruptedException {
+        try {
+
+            logger.info("validateLoginWithValidCredentials Started");
+            LoginPage loginPage=new LoginPage(driver);
+            loginPage.enterEmail("nandeesh.apjkalam@gmail.com");
+            loginPage.enterPassword("Apjkalam!123");
+            loginPage.clickLogin();
+
+            MyAccountPage myAccountPage=new MyAccountPage(driver);
+            boolean status=myAccountPage.isMyAcccountTextDisplayed();
+            Assert.assertEquals(status,true);
+            logger.info("validateLoginWithValidCredentials Ended");
+
+        } catch (Exception e) {
+            logger.error("Test case failed");
+            logger.debug("Debug Logs");
+            Assert.fail();
+        }
+
+    }
+}
+
+
+Step 5: Run Tests on Desired browser/Cross browser/Parallel testing
+-------------------------------------------------------------------
+5.1: Desired browser testing
+----------------------------
+->Desired browser and Cross browser can be achieved by using <parameter> tag in xml file and @Parameters annotation in test, setup, teardown methods
+<parameter name="browser" value="chrome"></parameter>
+@Parameters({"os", "browser"})
+->Create testng.xml file and use parameter tag to pass data
+->Add required classes containing test methods
+->Pass browser name and OS to Base Class setup() from testng.xml file
+
+Ex: testing.xml file
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Practice Suite">
+    <test name="Test Basics 1">
+        <parameter name="os" value="windows"></parameter>
+        <parameter name="browser" value="chrome"></parameter>
+        <classes>
+            <class name="testcases.TC01AccountRegistrationtest"/>
+        </classes>
+    </test> <!-- Test -->
+</suite> <!-- Suite -->
+
+Ex: Base class which accepts data
+Base class setup()
+    @BeforeClass
+    @Parameters({"os", "browser"})
+    void setup(String osName, String browserName) throws InterruptedException {
+        logger = LogManager.getLogger(this.getClass());
+
+        switch (browserName.toLowerCase()) {
+            case "chrome" -> driver = new ChromeDriver();
+            case "firefox" -> driver = new FirefoxDriver();
+            case "edge" -> driver = new EdgeDriver();
+            default -> {
+                System.out.println("Invalid Browser");
+                return;
+            }
+        }
+        driver.manage().window().maximize();
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+        driver.get("https://demo.opencart.com/en-gb?route=account/register");
+    }
+
+5.2: Cross Browser testing
+--------------------------
+->Configure Testng.xml file 
+->Specify browser value in xml file
+
+Ex:
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Practice Suite">
+    <test name="chrometest">
+        <parameter name="os" value="windows"></parameter>
+        <parameter name="browser" value="chrome"></parameter>
+        <classes>
+            <class name="testcases.TC01AccountRegistrationtest"/>
+        </classes>
+    </test> <!-- Test -->
+
+    <test name="firefoxtest">
+        <parameter name="os" value="windows"></parameter>
+        <parameter name="browser" value="firefox"></parameter>
+        <classes>
+            <class name="testcases.TC01AccountRegistrationtest"/>
+        </classes>
+    </test> <!-- Test -->
+</suite> <!-- Suite -->
+
+5.3: Parallel testing with Cross browser
+----------------------------------------
+->Add parallel="tests" attribute in Suite tag and also specify thread count
+thread-count="5"
+parallel="tests"
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Practice Suite" thread-count="5" parallel="tests">
+    <test name="chrometest">
+        <parameter name="os" value="windows"></parameter>
+        <parameter name="browser" value="chrome"></parameter>
+        <classes>
+            <class name="testcases.TC01AccountRegistrationtest"/>
+        </classes>
+    </test> <!-- Test -->
+
+    <test name="firefoxtest">
+        <parameter name="os" value="windows"></parameter>
+        <parameter name="browser" value="firefox"></parameter>
+        <classes>
+            <class name="testcases.TC01AccountRegistrationtest"/>
+        </classes>
+    </test> <!-- Test -->
+</suite> <!-- Suite -->
+
+Step 6 Reading Common values from properties file
+-------------------------------------------------
+->Add config.properties file under src/test/resources
+->Update Base class setup() for loading config.properties file
+->Get the value and use it using getProperty()
+
+Ex: config.properties[key=vale]
+registerAppURL=https://demo.opencart.com/en-gb?route=account/register\
+
+Ex: Base Class
+
+import java.util.Properties;
+
+public class BaseClass {
+    public Properties properties;
+
+    @BeforeClass
+    void setup() throws InterruptedException, IOException {
+        //Properties file reading
+        FileReader fileReader = new FileReader("./src//test//resources//config.properties");
+        properties = new Properties();
+        properties.load(fileReader);
+        String registerUrl = properties.getProperty("registerAppURL");
+        driver.get(registerUrl);
+    }
+
+}
+
+Step 7 Data driven Testing
+---------------------------
+Data provider method
+public class DataProviders {
+
+	@DataProvider(name="LoginData")
+	public String [][] getData() throws IOException
+	{
+         	return logindata;//returning two dimension array			
+	}
+	
+}
+DDT Test method
+public class TC003LoginDDTtest extends BaseClass {
+    @Test(dataProvider = "LoginData", dataProviderClass = DataProviders.class)
+    void validateLoginDDT(String email, String password, String exp) throws InterruptedException {
+        LoginPage loginPage = new LoginPage(driver);
+        loginPage.enterEmail(email);
+        loginPage.enterPassword(password);
+        loginPage.clickLogin();
+    }
+}
+ 
+->Prepare test data in excel and keep it in testdata folder
+->Create ExcelUtility class under utilities package
+     It has all methods to get row count, column count, get data, set data,..
+     Need to create object for this class by passing the path and use those methods
+->Create DataProviders class[@DataProvider] and keep in utilities package
+     Create dataProvider method getdata() inside it 
+        Create Object for ExcelUtility by passing Excel test data file path, use those methods present in ExcelUtility class and read the test data from excel, put into 2D array and return it to calling method[test case method]
+->Create Datadriver Testcase method
+  Accept data from dataProvider method
+
+@Test(dataProvider = "LoginData", dataProviderClass = DataProviders.class)
+Arg 1: Data provider name
+Arg 2: Data provider class name, sinc its in other package else its optional
+
+
+Ex: Data Provider class containing getData() method which will send data in form of 2d array to data driven test case methods
+public class DataProviders {
+
+	@DataProvider(name="LoginData")
+	public String [][] getData() throws IOException
+	{
+		String path=".\\testData\\Opencart_LoginData.xlsx";//taking xl file from testData
+		
+		ExcelUtility xlutil=new ExcelUtility(path);//creating an object for XLUtility
+		
+		int totalrows=xlutil.getRowCount("Sheet1");	
+		int totalcols=xlutil.getCellCount("Sheet1",1);
+				
+		String logindata[][]=new String[totalrows][totalcols];//created for two dimension array which can store the data user and password
+		
+		for(int i=1;i<=totalrows;i++)  //1   //read the data from xl storing in two deminsional array
+		{		
+			for(int j=0;j<totalcols;j++)  //0    i is rows j is col
+			{
+				logindata[i-1][j]= xlutil.getCellData("Sheet1",i, j);  //1,0
+			}
+		}
+	return logindata;//returning two dimension array
+				
+	}
+	
+}
+
+Ex: DDT Method
+package testcases;
+
+import org.testng.Assert;
+import org.testng.annotations.Test;
+import pageobjects.LoginPage;
+import pageobjects.MyAccountPage;
+import utilities.DataProviders;
+
+public class TC003LoginDDTtest extends BaseClass {
+    @Test(dataProvider = "LoginData", dataProviderClass = DataProviders.class)
+    void validateLoginDDT(String email, String password, String exp) throws InterruptedException {
+        logger.info("validateLoginDDT Started");
+        LoginPage loginPage = new LoginPage(driver);
+        loginPage.enterEmail(email);
+        loginPage.enterPassword(password);
+        loginPage.clickLogin();
+
+        MyAccountPage myAccountPage = new MyAccountPage(driver);
+        boolean status = myAccountPage.isMyAcccountTextDisplayed();
+
+        /*
+        Valid data: Login success    PASS
+                    Login fail       FAIL
+        In Valid data: Login success FAIL
+                       Login fail    PASS
+        */
+
+        if (exp.equalsIgnoreCase("valid")) {
+            if (status == true) {
+                Assert.assertTrue(true);
+                myAccountPage.clickLogout();
+            } else {
+                Assert.assertTrue(false);
+            }
+        } else if (exp.equalsIgnoreCase("invalid")) {
+            if (status == true) {
+                Assert.assertTrue(false);
+                myAccountPage.clickLogout();
+            } else {
+                Assert.assertTrue(true);
+            }
+        }
+        logger.info("validateLoginDDT Ended");
+    }
+}
+ 
+Ex: Excel utility class
+package utilities;
+
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+public class ExcelUtility {
+
+	public FileInputStream fi;
+	public FileOutputStream fo;
+	public XSSFWorkbook workbook;
+	public XSSFSheet sheet;
+	public XSSFRow row;
+	public XSSFCell cell;
+	public CellStyle style;   
+	String path;
+	
+	public ExcelUtility(String path)
+	{
+		this.path=path;
+	}
+		
+	public int getRowCount(String sheetName) throws IOException 
+	{
+		fi=new FileInputStream(path);
+		workbook=new XSSFWorkbook(fi);
+		sheet=workbook.getSheet(sheetName);
+		int rowcount=sheet.getLastRowNum();
+		workbook.close();
+		fi.close();
+		return rowcount;		
+	}
+	
+	public int getCellCount(String sheetName,int rownum) throws IOException
+	{
+		fi=new FileInputStream(path);
+		workbook=new XSSFWorkbook(fi);
+		sheet=workbook.getSheet(sheetName);
+		row=sheet.getRow(rownum);
+		int cellcount=row.getLastCellNum();
+		workbook.close();
+		fi.close();
+		return cellcount;
+	}
+	
+	
+	public String getCellData(String sheetName,int rownum,int colnum) throws IOException
+	{
+		fi=new FileInputStream(path);
+		workbook=new XSSFWorkbook(fi);
+		sheet=workbook.getSheet(sheetName);
+		row=sheet.getRow(rownum);
+		cell=row.getCell(colnum);
+		
+		DataFormatter formatter = new DataFormatter();
+		String data;
+		try{
+		data = formatter.formatCellValue(cell); //Returns the formatted value of a cell as a String regardless of the cell type.
+		}
+		catch(Exception e)
+		{
+			data="";
+		}
+		workbook.close();
+		fi.close();
+		return data;
+	}
+	
+	public void setCellData(String sheetName,int rownum,int colnum,String data) throws IOException
+	{
+		File xlfile=new File(path);
+		if(!xlfile.exists())    // If file not exists then create new file
+		{
+		workbook=new XSSFWorkbook();
+		fo=new FileOutputStream(path);
+		workbook.write(fo);
+		}
+				
+		fi=new FileInputStream(path);
+		workbook=new XSSFWorkbook(fi);
+			
+		if(workbook.getSheetIndex(sheetName)==-1) // If sheet not exists then create new Sheet
+			workbook.createSheet(sheetName);
+		sheet=workbook.getSheet(sheetName);
+					
+		if(sheet.getRow(rownum)==null)   // If row not exists then create new Row
+				sheet.createRow(rownum);
+		row=sheet.getRow(rownum);
+		
+		cell=row.createCell(colnum);
+		cell.setCellValue(data);
+		fo=new FileOutputStream(path);
+		workbook.write(fo);		
+		workbook.close();
+		fi.close();
+		fo.close();
+	}
+	
+	
+	public void fillGreenColor(String sheetName,int rownum,int colnum) throws IOException
+	{
+		fi=new FileInputStream(path);
+		workbook=new XSSFWorkbook(fi);
+		sheet=workbook.getSheet(sheetName);
+		
+		row=sheet.getRow(rownum);
+		cell=row.getCell(colnum);
+		
+		style=workbook.createCellStyle();
+		
+		style.setFillForegroundColor(IndexedColors.GREEN.getIndex());
+		style.setFillPattern(FillPatternType.SOLID_FOREGROUND); 
+				
+		cell.setCellStyle(style);
+		workbook.write(fo);
+		workbook.close();
+		fi.close();
+		fo.close();
+	}
+	
+	
+	public void fillRedColor(String sheetName,int rownum,int colnum) throws IOException
+	{
+		fi=new FileInputStream(path);
+		workbook=new XSSFWorkbook(fi);
+		sheet=workbook.getSheet(sheetName);
+		row=sheet.getRow(rownum);
+		cell=row.getCell(colnum);
+		
+		style=workbook.createCellStyle();
+		
+		style.setFillForegroundColor(IndexedColors.RED.getIndex());
+		style.setFillPattern(FillPatternType.SOLID_FOREGROUND);  
+		
+		cell.setCellStyle(style);		
+		workbook.write(fo);
+		workbook.close();
+		fi.close();
+		fo.close();
+	}
+	
+}
+
+Step 8: Grouping Test cases
+---------------------------
+->Use groups attribute for @Test,@BeforeClass @AfterClass methods  
+Ex:
+@Test(groups={"sanity"})
+@BeforeClass(groups = {"sanity"})
+@AfterClass(groups = {"sanity"})
+
+->In Testng.xml specify the groups method to be executed inside suite tag
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Practice Suite">
+    <groups>
+        <run>
+            <include name="sanity"/>
+            <exclude name="regression"></exclude>
+        </run>
+    </groups>
+    <test name="Test Basics 1">
+        <parameter name="os" value="windows"></parameter>
+        <parameter name="browser" value="chrome"></parameter>
+        <classes>
+            <class name="testcases.TC003LoginDDTtest"/>
+        </classes>
+    </test> <!-- Test -->
+</
+
+Step 9: Add Extent reports
+--------------------------
+->Create ExtentReportUtility[ExtentReportManager] class under utilities package
+	ExtentReportManager class implements ITestListener interface
+           Usses three classes
+		    public ExtentSparkReporter sparkReporter;
+    		    public ExtentReports extent;
+    		    public ExtentTest test; //Method level
+	Implements below methods
+		onStart
+                   Report Configuration [ExtentSparkReporter,ExtentReports]
+ 		onTestSuccess [ExtentTest]
+		   Update status as Pass
+		onTestFailure [ExtentTest]
+                   Takes screenshot, attach to report and update status as fail
+		onTestSkipped[ExtentTest]
+		    Update tatus as Skipped
+		onFinish [ExtentReports]
+		    Flush the report
+
+->Add captureScreen() method in Baseclass
+	TakesScreenshot and getScreenshotAs()
+
+Ex:
+    public String captureScreen(String tname) throws IOException {
+        String timeStamp = new SimpleDateFormat("yyyyMMddhhmmss").format(new Date());
+        TakesScreenshot takesScreenshot = (TakesScreenshot) driver;
+        File sourceFile = takesScreenshot.getScreenshotAs(OutputType.FILE);
+        String targetFilePath = System.getProperty("user.dir") + "\\screenshots\\" + tname + "_" + timeStamp + ".png";
+        File targetFile = new File(targetFilePath);
+        sourceFile.renameTo(targetFile);
+        return targetFilePath;
+    }
+
+
+->Add ExtentReportUtility(Listener Class) in Testng.xml file
+Ex:
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Practice Suite">
+    <listeners>
+        <listener class-name="utilities.ExtentReportManager"/>
+    </listeners>
+    
+    <test name="Test Basics 1">
+        <parameter name="os" value="windows"></parameter>
+        <parameter name="browser" value="chrome"></parameter>
+        <classes>
+            <class name="testcases.TC003LoginDDTtest"/>
+        </classes>
+    </test> <!-- Test -->
+</suite> 
+->Make sure Webdriver is static in Base class, same driver reference will be used in ExtentreportUtility
+
+Ex: Excl Utiities class [ExtentReportManager]
+package utilities;
+
+import com.aventstack.extentreports.ExtentReports;
+import com.aventstack.extentreports.ExtentTest;
+import com.aventstack.extentreports.Status;
+import com.aventstack.extentreports.reporter.ExtentSparkReporter;
+import com.aventstack.extentreports.reporter.configuration.Theme;
+import org.apache.commons.mail.DefaultAuthenticator;
+import org.apache.commons.mail.ImageHtmlEmail;
+import org.apache.commons.mail.resolver.DataSourceUrlResolver;
+import org.testng.ITestContext;
+import org.testng.ITestListener;
+import org.testng.ITestResult;
+import testcases.BaseClass;
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+
+public class ExtentReportManager implements ITestListener {
+    public ExtentSparkReporter sparkReporter;
+    public ExtentReports extent;
+    public ExtentTest test;
+
+    String repName;
+
+    public void onStart(ITestContext testContext) {
+		
+		/*SimpleDateFormat df=new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss");
+		Date dt=new Date();
+		String currentdatetimestamp=df.format(dt);
+		*/
+
+        String timeStamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());// time stamp
+        repName = "Test-Report-" + timeStamp + ".html";
+        sparkReporter = new ExtentSparkReporter(".\\reports\\" + repName);// specify location of the report
+
+        sparkReporter.config().setDocumentTitle("opencart Automation Report"); // Title of report
+        sparkReporter.config().setReportName("opencart Functional Testing"); // name of the report
+        sparkReporter.config().setTheme(Theme.DARK);
+
+        extent = new ExtentReports();
+        extent.attachReporter(sparkReporter);
+        extent.setSystemInfo("Application", "opencart");
+        extent.setSystemInfo("Module", "Admin");
+        extent.setSystemInfo("Sub Module", "Customers");
+        extent.setSystemInfo("User Name", System.getProperty("user.name"));
+        extent.setSystemInfo("Environemnt", "QA");
+
+        String os = testContext.getCurrentXmlTest().getParameter("os");
+        extent.setSystemInfo("Operating System", os);
+
+        String browser = testContext.getCurrentXmlTest().getParameter("browser");
+        extent.setSystemInfo("Browser", browser);
+
+        List<String> includedGroups = testContext.getCurrentXmlTest().getIncludedGroups();
+        if (!includedGroups.isEmpty()) {
+            extent.setSystemInfo("Groups", includedGroups.toString());
+        }
+    }
+
+    public void onTestSuccess(ITestResult result) {
+
+        test = extent.createTest(result.getTestClass().getName());
+        test.assignCategory(result.getMethod().getGroups()); // to display groups in report
+        test.log(Status.PASS, result.getName() + " got successfully executed");
+
+    }
+
+    public void onTestFailure(ITestResult result) {
+        test = extent.createTest(result.getTestClass().getName());
+        test.assignCategory(result.getMethod().getGroups());
+
+        test.log(Status.FAIL, result.getName() + " got failed");
+        test.log(Status.INFO, result.getThrowable().getMessage());
+
+        try {
+            String imgPath = new BaseClass().captureScreen(result.getName());
+            test.addScreenCaptureFromPath(imgPath);
+
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+    }
+
+    public void onTestSkipped(ITestResult result) {
+        test = extent.createTest(result.getTestClass().getName());
+        test.assignCategory(result.getMethod().getGroups());
+        test.log(Status.SKIP, result.getName() + " got skipped");
+        test.log(Status.INFO, result.getThrowable().getMessage());
+    }
+
+    public void onFinish(ITestContext testContext) {
+
+        extent.flush();
+
+		//To open report once test is executed
+        String pathOfExtentReport = System.getProperty("user.dir") + "\\reports\\" + repName;
+        File extentReport = new File(pathOfExtentReport);
+
+
+        try {
+            Desktop.getDesktop().browse(extentReport.toURI());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+		//To send report in email after execution
+		 try {
+			  URL url = new URL("file:///"+System.getProperty("user.dir")+"\\reports\\"+repName);
+
+		  // Create the email message
+		  ImageHtmlEmail email = new ImageHtmlEmail();
+		  email.setDataSourceResolver(new DataSourceUrlResolver(url));
+		  email.setHostName("smtp.googlemail.com");
+		  email.setSmtpPort(465);
+		  email.setAuthenticator(new DefaultAuthenticator("nandeesh.apjkalam@gmail.com","Apjkalam!123"));
+		  email.setSSLOnConnect(true);
+		  email.setFrom("nandeesh.apjkalam@gmail.com"); //Sender
+		  email.setSubject("Test Results");
+		  email.setMsg("Please find Attached Report....");
+		  email.addTo("appuismyhero@gmail.com"); //Receiver
+		  email.attach(url, "extent report", "please check report...");
+		  email.send(); // send the email
+		  }
+		  catch(Exception e)
+		  {
+			  e.printStackTrace();
+			  }
+
+
+    }
+
+}
+
+Step 10: Run failed test cases
+------------------------------
+->Under test-output folder
+    Run testng-failed.xml file
+  	This xml contains only previous failed test cases details
+
+Step 11: Running Test on Selenium Grid
+--------------------------------------
+->Grid has 2 components Hub[controller] and Node[Remote machines]
+
+Docker:
+Images[OS]-->Containers[VM]
+
+Standalone setup[Single machine]: 1 machine both hub and nodes
+Distributed setup[Multiple machine]: 1 Machine for hub and other machines for nodes
+
+->Standalone setup[Single machine]
+Download selenium-server-4.23.0 jar and place it in the machine
+Run command to start Selenium grid using command prompt
+java -jar selenium-server-4.23.1.jar standalone
+URL to see the sessions: http://192.168.1.4:4444
+
+->Distributed setup[Multiple machine]
+Download selenium-server-4.15.0 jar and place it in the both machine[Hub and Node]
+Run command to start Selenium grid on Hub machine
+java -jar selenium-server-4.15.0.jar hub
+Run command to start Selenium grid on node machine
+java -jar selenium-server-4.15.0.jar node --hub http://<hub ip>:4444
+URL to see the sessions: http://localhst:4444/
+
+->Executing Automation script settings
+Step 1: To be added in setup()
+        String hubURL="http://192.168.1.4:4444/wd/hub";
+        DesiredCapabilities desiredCapabilities=new DesiredCapabilities();
+        desiredCapabilities.setPlatform(Platform.WIN11);
+        desiredCapabilities.setBrowserName("chrome");
+        WebDriver driver=new RemoteWebDriver(new URL(hubURL),desiredCapabilities);
+
+Step 2: To be add in config .properties file
+execution_env=local
+execution_env=remote
+
+Step : Run test from testing.xml file
+
+Ex:
+@BeforeClass(groups = {"sanity"})
+    @Parameters({"os", "browser"})
+    void setup(String osName, String browserName) throws InterruptedException, IOException {
+        //Logging
+        logger = LogManager.getLogger(this.getClass());
+
+        //Properties file reading
+        FileReader fileReader = new FileReader("./src//test//resources//config.properties");
+        properties = new Properties();
+        properties.load(fileReader);
+        String loginURL = properties.getProperty("url");
+
+        //Configuration for remote selenum grid execution
+        String hubURL = "http://192.168.1.4:4444/wd/hub";
+
+        String executionPlatform = properties.getProperty("execution_env");
+        System.out.println("EXECUTION PLATFORM:" + executionPlatform);
+
+        if (executionPlatform.equalsIgnoreCase("remote")) {
+            DesiredCapabilities desiredCapabilities = new DesiredCapabilities();
+
+            //OS
+            if (osName.equalsIgnoreCase("windows")) {
+                desiredCapabilities.setPlatform(Platform.WIN11);
+            } else if (osName.equalsIgnoreCase("mac")) {
+                desiredCapabilities.setPlatform(Platform.IOS);
+            } else {
+                System.out.println("Invalid OS");
+                return;
+            }
+
+            //Browser
+            if (browserName.equalsIgnoreCase("chrome")) {
+                desiredCapabilities.setBrowserName("chrome");
+            } else if (browserName.equalsIgnoreCase("firefox")) {
+                desiredCapabilities.setBrowserName("Firefox");
+            } else if (browserName.equalsIgnoreCase("edge")) {
+                desiredCapabilities.setBrowserName("MicrosoftEdge");
+            } else {
+                System.out.println("Invalid BROWSER");
+                return;
+            }
+
+            driver = new RemoteWebDriver(new URL(hubURL), desiredCapabilities);
+        } else if (executionPlatform.equalsIgnoreCase("local")) {
+            switch (browserName.toLowerCase()) {
+                case "chrome" -> driver = new ChromeDriver();
+                case "firefox" -> driver = new FirefoxDriver();
+                case "edge" -> driver = new EdgeDriver();
+                default -> {
+                    System.out.println("Invalid Browser");
+                    return;
+                }
+            }
+        }
+
+        driver.manage().window().maximize();
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+        System.out.println("URL is:" + loginURL);
+        driver.get(loginURL);
+    }
+
+Step 12: Docker integration with Selenium grid
+-----------------------------------------------
+->Docker Hub->Images->Container
+->Download Images from Docker hub repo and create Container from those Images then we can run our scripts on the container.
+
+->To check version
+docker version
+docker-compose version
+docker -v
+docker info
+
+->To list all docker commands
+docker --help
+
+->To login to docker
+docker login
+nandeeshcl
+Apjkalam!123
+
+Docker Images Commands
+-----------------------
+->To see all existing image
+docker images
+
+->To pull images
+docker pull <image name>
+Ex: docker pull ubuntu
+
+->To delete existing image
+docker rmi <imageid>
+Can get image id using docker images command
+
+Container Commands
+------------------
+->To see running containers
+docker ps
+
+->Create container [download if image not exist and create container]
+docker run <imagename>
+Ex: docker run ubuntu
+
+->Start the container using below command or through UI
+docker start <container id or container name>
+
+->Stop the container after use using below command or through UI
+docker stop <container id or container name>
+
+->Remove the container if not needed using below command or through UI
+docker rm <container id or container name>
+docker system prune -f //delete all container at once
+
+->To interact with container
+docker run -it <container name or id>
+
+Note: One image can contain multiple container
+
+->To see docker containers statistics
+docker stats
+
+Running automation scripts on docker container [Selenium grid with docker containers]
+-------------------------------------------------------------------------------------
+Selenium Grid [Hub + Nodes]
+Automation scripts->SG->Docker Containers
+
+->Download 3 images [1 hub and 2 different nodes]
+hub
+linux-firefox [node]
+linux-chrome  [node]
+->Create 3 containers
+->Add into one network
+
+Commands:
+->Pull 3 images one for hub and another 2 for Nodes
+docker pull selenium/hub
+docker pull selenium/node-firefox
+docker pull selenium/node-chrome
+
+->Verify images
+docker images
+
+->Create network to add all hub and nodes into it
+docker network create <network name>
+Ex: docker network create grid
+
+->Create Hub containers in network 
+docker run -d -p 4442-4444:4442-4444 --net <network name> --name <hub name> <image name>
+Ex: docker run -d -p 4442-4444:4442-4444 --net grid --name selenium-hub selenium/hub
+
+->Create Node containers in network
+docker run -d --net <network name> -e SE_EVENT_BUS_HOST=<node name> -e SE_EVENT_BUS_PUBLISH_PORT=4442 -e 
+SE_EVENT_BUS_SUBSCRIBE_PORT=4443 <image name>
+Ex 1: docker run -d --net grid -e SE_EVENT_BUS_HOST=selenium-hub -e SE_EVENT_BUS_PUBLISH_PORT=4442 -e 
+SE_EVENT_BUS_SUBSCRIBE_PORT=4443 selenium/node-chrome
+
+Ex 2: docker run -d --net grid -e SE_EVENT_BUS_HOST=selenium-hub -e SE_EVENT_BUS_PUBLISH_PORT=4442 -e 
+SE_EVENT_BUS_SUBSCRIBE_PORT=4443 selenium/node-firefox
+
+->To see running containers 
+docker ps
+
+->Go to Selenium Grid dashboard, we can see created nodes 
+http://localhost:4444/ui/
+
+->Execute using testing.xml
+
+->To remove network
+docker network rm grid
+
+Ex:Docker.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Practice Suite" >
+
+    <listeners>
+        <listener class-name="utilities.ExtentReportManager"/>
+    </listeners>
+
+    <test name="Test Basics 1">
+        <parameter name="os" value="linux"></parameter>
+        <parameter name="browser" value="chrome"></parameter>
+        <classes>
+            <class name="testcases.TC02Logintest"/>
+        </classes>
+    </test> <!-- Test -->
+
+
+</suite> <!-- Suite -->
+
+Ex: Base Class
+public class BaseClass {
+    public static WebDriver driver;
+    public Logger logger;
+    public Properties properties;
+
+
+    @BeforeClass(groups = {"sanity"})
+    @Parameters({"os", "browser"})
+    void setup(String osName, String browserName) throws InterruptedException, IOException {
+        //Logging
+        logger = LogManager.getLogger(this.getClass());
+
+        //Properties file reading
+        FileReader fileReader = new FileReader("./src//test//resources//config.properties");
+        properties = new Properties();
+        properties.load(fileReader);
+        String loginURL = properties.getProperty("url");
+
+        //Configuration for remote selenum grid execution
+        String hubURL = "http://192.168.1.4:4444/wd/hub";
+
+        String executionPlatform = properties.getProperty("execution_env");
+        System.out.println("EXECUTION PLATFORM:" + executionPlatform);
+
+        if (executionPlatform.equalsIgnoreCase("remote")) {
+            DesiredCapabilities desiredCapabilities = new DesiredCapabilities();
+
+            //OS
+            if (osName.equalsIgnoreCase("windows")) {
+                desiredCapabilities.setPlatform(Platform.WIN11);
+            } else if (osName.equalsIgnoreCase("mac")) {
+                desiredCapabilities.setPlatform(Platform.IOS);
+            }
+            else if (osName.equalsIgnoreCase("linux")) {
+                desiredCapabilities.setPlatform(Platform.LINUX);
+            } else {
+                System.out.println("Invalid OS");
+                return;
+            }
+
+            //Browser
+            if (browserName.equalsIgnoreCase("chrome")) {
+                desiredCapabilities.setBrowserName("chrome");
+            } else if (browserName.equalsIgnoreCase("firefox")) {
+                desiredCapabilities.setBrowserName("Firefox");
+            } else if (browserName.equalsIgnoreCase("edge")) {
+                desiredCapabilities.setBrowserName("MicrosoftEdge");
+            } else {
+                System.out.println("Invalid BROWSER");
+                return;
+            }
+
+            driver = new RemoteWebDriver(new URL(hubURL), desiredCapabilities);
+        } 
+
+        driver.manage().window().maximize();
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+        System.out.println("URL is:" + loginURL);
+        driver.get(loginURL);
+    }
+
+}
+
+Selenium Grid Setup with
+docker-compose.yaml file
+------------------
+->To create nodes and hubs automatically without manual intervention
+->Create yaml file "docker-compose.yaml" with all configurations related to hub and nodes 
+->Place it in test/resources folder
+->Execution f Yaml file
+Go to file location where yaml file present src/test/resources 
+open command prompt
+execute below command
+docker-compose up
+->Execute testing.xml file
+
+
+->To check hub & nodes running state:
+http://localhost:4444/grid/console
+->To stop the grid and cleanup the created containers:
+docker-compose down
+
+Overview
+--------
+->Manual
+Pull required images for hub[1] and nodes[1 to N]
+Create network
+Create Containers for all Hub and Nodes using images in network
+Execute automation script using Selenium grid on Docker containers
+
+->Automatic[Yaml File]
+Create Yaml file with all node and hub configuration
+Execute yaml file to create node and hub containers
+Execute automation script using Selenium grid on Docker containers
+
+Note:
+Automation Scripts->Selenium grid-->Docker->Containers ->Execution
+Docker containers acts as Virtual machines
+
+Step 13: Execution using pom.xml file
+------------------------------------
+->pom.xml
+  To add dependency
+  To add plugins to compile and run the project[add before dependencies.
+      maven-compiler-plugin
+      maven-surefire-plugin
+->Create testng.xml file and specify in pom.xml
+
+Ex:
+<build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.13.0</version>
+                    <configuration>
+                        <source>11</source>
+                        <target>11</target>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>3.3.1</version>
+                    <configuration>
+                        <suiteXmlFiles>
+                            <suiteXmlFile>
+                                testng.xml
+                            </suiteXmlFile>
+                        </suiteXmlFiles>
+                    </configuration>
+                </plugin>
+
+            </plugins>
+        </pluginManagement>
+    </build>
+
+->Run pom.xml file
+  RC->maven->Run as->maven test
+
+or Open command prompt 
+
+mvn clean
+mvn compile
+mvn test
+
+Step 14: CI and CD 
+-------------------
+Devops
+ Build creation for Dev code available in Git Hub
+ Run Automation
+     Jenkins takes code available in GitHub and execute those test scripts
+ Build certification
+     If all Test scripts executed and passed then it will be considered as Success
+
+->Whenever new build is created by Devops team, Sanity scripts will be executed by Devops team as Run Automation step.
+->QA should move code to Git Hub so Jenkins can pull the latest code from Git Hub to execute on new or old build.
+
+14.1 Push project to GitHub repo
+--------------------------------
+//Create local repo
+git init
+
+//Provide User info
+git config --global user.name <>
+git config --global user.email <>
+
+//Add files to staging area
+git add .
+git add filenamewithextendsion
+git add java.*
+
+//Add files to local repo
+git commit -m <>
+
+//Change branch name
+git branch -M main
+
+//Link remote to local repo
+git remote add origin https://github.com/CLNandeesh/Selenium-Test-NG-Hybrid-Framework---SDET-2024.git
+
+//Add files from local repository to remote repository
+git push -u origin main
+git push <local branch name> <remote repo>
+
+//To get all updated code from remote to local repo
+git pull
+
+//Existing project cloning to local workspace
+git clone <url>
+
+14.2 Jenkins
+------------
+->Picks code from git hub and execute
+http://localhost:8080/
+admin
+admin
+
+->Create new maven project and specify GitHub Url and provide goal as test
+or path of pom.xml file
+
+*********************************************************************************************************************************************************
+Overview and Blue print
+========================
