@@ -1,20 +1,36 @@
 Topics
 ======
-1) Selenium and Framework
-Source: RS/Udemy
+1) Java
+Status: Done
 
-2) API Automation and Framework
+2) Selenium and Framework
+Source: RS/Udemy
+Status: 
+
+3) API Automation and Framework
 Source: OC/Udemy
+Status: 
 
-3) Load runner 
+4) Load runner 
 Source: Trainer
+Status: 
 
-4) Selenium and API Interview questions
+5) Selenium and API Interview questions
 Source: RS/Udemy
+Status: 
 
-5) Manual testing
+6) Manual testing
 Source: Pavan/Youtube
+Status: 
 
-6) SQL
+7) SQL
 Source: 
+Status: 
+
+8) Git hub and Jenkins
+Status:
+
+
+
+
 

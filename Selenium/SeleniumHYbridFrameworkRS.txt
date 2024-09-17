@@ -23,8 +23,11 @@ Selenium Hybrid Automation Framework
 	5.16 Adding Logs
 6. Interview Questions on Framework
 7. Framework architecture
+8. Selenium Grid and Docker
 
-REPO: https://github.com/CLNandeesh/Selenium-Hybrid-Framework-RS-Ecommerce-App-Sept-2024
+Code: https://github.com/CLNandeesh/Selenium-Hybrid-Framework-RS-Ecommerce-App-Sept-2024
+Notes: https://github.com/CLNandeesh/Automation-Tester-Notes-Sep-2024
+
 *********************************************************************************************************************************************************
 Objective of Framework
 ======================
@@ -1850,3 +1853,333 @@ Excel reader class : Used to read data from excel and send it to Data provider c
 Data provider class : Accepts data from Excel reader class and send it to Test method
 
 *********************************************************************************************************************************************************
+Selenium Grid and Docker
+========================
+Running Test on Selenium Grid
+-----------------------------
+->Grid has 2 components Hub[controller] and Node[Remote machines]
+
+Docker:
+Images[OS]-->Containers[VM]
+
+Standalone setup[Single machine]: 1 machine both hub and nodes
+Distributed setup[Multiple machine]: 1 Machine for hub and other machines for nodes
+
+->Standalone setup[Single machine]
+Download selenium-server-4.23.0 jar and place it in the machine
+Run command to start Selenium grid using command prompt
+java -jar selenium-server-4.23.1.jar standalone
+URL to see the sessions: http://192.168.1.4:4444
+
+->Distributed setup[Multiple machine]
+Download selenium-server-4.15.0 jar and place it in the both machine[Hub and Node]
+Run command to start Selenium grid on Hub machine
+java -jar selenium-server-4.15.0.jar hub
+Run command to start Selenium grid on node machine
+java -jar selenium-server-4.15.0.jar node --hub http://<hub ip>:4444
+URL to see the sessions: http://localhst:4444/
+
+->Executing Automation script settings
+Step 1: To be added in setup()
+        String hubURL="http://192.168.1.4:4444/wd/hub";
+        DesiredCapabilities desiredCapabilities=new DesiredCapabilities();
+        desiredCapabilities.setPlatform(Platform.WIN11);
+        desiredCapabilities.setBrowserName("chrome");
+        WebDriver driver=new RemoteWebDriver(new URL(hubURL),desiredCapabilities);
+
+Step 2: To be add in config .properties file
+execution_env=local
+execution_env=remote
+
+Step : Run test from testing.xml file
+
+Ex:
+@BeforeClass(groups = {"sanity"})
+    @Parameters({"os", "browser"})
+    void setup(String osName, String browserName) throws InterruptedException, IOException {
+        //Logging
+        logger = LogManager.getLogger(this.getClass());
+
+        //Properties file reading
+        FileReader fileReader = new FileReader("./src//test//resources//config.properties");
+        properties = new Properties();
+        properties.load(fileReader);
+        String loginURL = properties.getProperty("url");
+
+        //Configuration for remote selenum grid execution
+        String hubURL = "http://192.168.1.4:4444/wd/hub";
+
+        String executionPlatform = properties.getProperty("execution_env");
+        System.out.println("EXECUTION PLATFORM:" + executionPlatform);
+
+        if (executionPlatform.equalsIgnoreCase("remote")) {
+            DesiredCapabilities desiredCapabilities = new DesiredCapabilities();
+
+            //OS
+            if (osName.equalsIgnoreCase("windows")) {
+                desiredCapabilities.setPlatform(Platform.WIN11);
+            } else if (osName.equalsIgnoreCase("mac")) {
+                desiredCapabilities.setPlatform(Platform.IOS);
+            } else {
+                System.out.println("Invalid OS");
+                return;
+            }
+
+            //Browser
+            if (browserName.equalsIgnoreCase("chrome")) {
+                desiredCapabilities.setBrowserName("chrome");
+            } else if (browserName.equalsIgnoreCase("firefox")) {
+                desiredCapabilities.setBrowserName("Firefox");
+            } else if (browserName.equalsIgnoreCase("edge")) {
+                desiredCapabilities.setBrowserName("MicrosoftEdge");
+            } else {
+                System.out.println("Invalid BROWSER");
+                return;
+            }
+
+            driver = new RemoteWebDriver(new URL(hubURL), desiredCapabilities);
+        } else if (executionPlatform.equalsIgnoreCase("local")) {
+            switch (browserName.toLowerCase()) {
+                case "chrome" -> driver = new ChromeDriver();
+                case "firefox" -> driver = new FirefoxDriver();
+                case "edge" -> driver = new EdgeDriver();
+                default -> {
+                    System.out.println("Invalid Browser");
+                    return;
+                }
+            }
+        }
+
+        driver.manage().window().maximize();
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+        System.out.println("URL is:" + loginURL);
+        driver.get(loginURL);
+    }
+
+Docker integration with Selenium grid
+-------------------------------------
+->Docker Hub->Images->Container
+->Download Images from Docker hub repo and create Container from those Images then we can run our scripts on the container.
+
+->To check version
+docker version
+docker-compose version
+docker -v
+docker info
+
+->To list all docker commands
+docker --help
+
+->To login to docker
+docker login
+nandeeshcl
+Apjkalam!123
+
+Docker Images Commands
+-----------------------
+->To see all existing image
+docker images
+
+->To pull images
+docker pull <image name>
+Ex: docker pull ubuntu
+
+->To delete existing image
+docker rmi <imageid>
+Can get image id using docker images command
+
+Container Commands
+------------------
+->To see running containers
+docker ps
+
+->Create container [download if image not exist and create container]
+docker run <imagename>
+Ex: docker run ubuntu
+
+->Start the container using below command or through UI
+docker start <container id or container name>
+
+->Stop the container after use using below command or through UI
+docker stop <container id or container name>
+
+->Remove the container if not needed using below command or through UI
+docker rm <container id or container name>
+docker system prune -f //delete all container at once
+
+->To interact with container
+docker run -it <container name or id>
+
+Note: One image can contain multiple container
+
+->To see docker containers statistics
+docker stats
+
+Running automation scripts on docker container [Selenium grid with docker containers]
+-------------------------------------------------------------------------------------
+Selenium Grid [Hub + Nodes]
+Automation scripts->SG->Docker Containers
+
+->Download 3 images [1 hub and 2 different nodes]
+hub
+linux-firefox [node]
+linux-chrome  [node]
+->Create 3 containers
+->Add into one network
+
+Commands:
+->Pull 3 images one for hub and another 2 for Nodes
+docker pull selenium/hub
+docker pull selenium/node-firefox
+docker pull selenium/node-chrome
+
+->Verify images
+docker images
+
+->Create network to add all hub and nodes into it
+docker network create <network name>
+Ex: docker network create grid
+
+->Create Hub containers in network 
+docker run -d -p 4442-4444:4442-4444 --net <network name> --name <hub name> <image name>
+Ex: docker run -d -p 4442-4444:4442-4444 --net grid --name selenium-hub selenium/hub
+
+->Create Node containers in network
+docker run -d --net <network name> -e SE_EVENT_BUS_HOST=<node name> -e SE_EVENT_BUS_PUBLISH_PORT=4442 -e 
+SE_EVENT_BUS_SUBSCRIBE_PORT=4443 <image name>
+Ex 1: docker run -d --net grid -e SE_EVENT_BUS_HOST=selenium-hub -e SE_EVENT_BUS_PUBLISH_PORT=4442 -e 
+SE_EVENT_BUS_SUBSCRIBE_PORT=4443 selenium/node-chrome
+
+Ex 2: docker run -d --net grid -e SE_EVENT_BUS_HOST=selenium-hub -e SE_EVENT_BUS_PUBLISH_PORT=4442 -e 
+SE_EVENT_BUS_SUBSCRIBE_PORT=4443 selenium/node-firefox
+
+->To see running containers 
+docker ps
+
+->Go to Selenium Grid dashboard, we can see created nodes 
+http://localhost:4444/ui/
+
+->Execute using testing.xml
+
+->To remove network
+docker network rm grid
+
+Ex:Docker.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Practice Suite" >
+
+    <listeners>
+        <listener class-name="utilities.ExtentReportManager"/>
+    </listeners>
+
+    <test name="Test Basics 1">
+        <parameter name="os" value="linux"></parameter>
+        <parameter name="browser" value="chrome"></parameter>
+        <classes>
+            <class name="testcases.TC02Logintest"/>
+        </classes>
+    </test> <!-- Test -->
+
+
+</suite> <!-- Suite -->
+
+Ex: Base Class
+public class BaseClass {
+    public static WebDriver driver;
+    public Logger logger;
+    public Properties properties;
+
+
+    @BeforeClass(groups = {"sanity"})
+    @Parameters({"os", "browser"})
+    void setup(String osName, String browserName) throws InterruptedException, IOException {
+        //Logging
+        logger = LogManager.getLogger(this.getClass());
+
+        //Properties file reading
+        FileReader fileReader = new FileReader("./src//test//resources//config.properties");
+        properties = new Properties();
+        properties.load(fileReader);
+        String loginURL = properties.getProperty("url");
+
+        //Configuration for remote selenum grid execution
+        String hubURL = "http://192.168.1.4:4444/wd/hub";
+
+        String executionPlatform = properties.getProperty("execution_env");
+        System.out.println("EXECUTION PLATFORM:" + executionPlatform);
+
+        if (executionPlatform.equalsIgnoreCase("remote")) {
+            DesiredCapabilities desiredCapabilities = new DesiredCapabilities();
+
+            //OS
+            if (osName.equalsIgnoreCase("windows")) {
+                desiredCapabilities.setPlatform(Platform.WIN11);
+            } else if (osName.equalsIgnoreCase("mac")) {
+                desiredCapabilities.setPlatform(Platform.IOS);
+            }
+            else if (osName.equalsIgnoreCase("linux")) {
+                desiredCapabilities.setPlatform(Platform.LINUX);
+            } else {
+                System.out.println("Invalid OS");
+                return;
+            }
+
+            //Browser
+            if (browserName.equalsIgnoreCase("chrome")) {
+                desiredCapabilities.setBrowserName("chrome");
+            } else if (browserName.equalsIgnoreCase("firefox")) {
+                desiredCapabilities.setBrowserName("Firefox");
+            } else if (browserName.equalsIgnoreCase("edge")) {
+                desiredCapabilities.setBrowserName("MicrosoftEdge");
+            } else {
+                System.out.println("Invalid BROWSER");
+                return;
+            }
+
+            driver = new RemoteWebDriver(new URL(hubURL), desiredCapabilities);
+        } 
+
+        driver.manage().window().maximize();
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+        System.out.println("URL is:" + loginURL);
+        driver.get(loginURL);
+    }
+
+}
+
+Selenium Grid Setup with
+docker-compose.yaml file
+------------------
+->To create nodes and hubs automatically without manual intervention
+->Create yaml file "docker-compose.yaml" with all configurations related to hub and nodes 
+->Place it in test/resources folder
+->Execution f Yaml file
+Go to file location where yaml file present src/test/resources 
+open command prompt
+execute below command
+docker-compose up
+->Execute testing.xml file
+
+
+->To check hub & nodes running state:
+http://localhost:4444/grid/console
+->To stop the grid and cleanup the created containers:
+docker-compose down
+
+Overview
+--------
+->Manual
+Pull required images for hub[1] and nodes[1 to N]
+Create network
+Create Containers for all Hub and Nodes using images in network
+Execute automation script using Selenium grid on Docker containers
+
+->Automatic[Yaml File]
+Create Yaml file with all node and hub configuration
+Execute yaml file to create node and hub containers
+Execute automation script using Selenium grid on Docker containers
+
+Note:
+Automation Scripts->Selenium grid-->Docker->Containers ->Execution
+Docker containers acts as Virtual machines
