@@ -1,3 +1,227 @@
+Selenium and Core Java 
+======================
+1. Challenges with Selenium
+->No support for non web application
+->Sync issues
+->Limited reporting and other features, need to integrate with external API
+
+2. Selenium 4 features
+->Web driver is developed completely by W3C standardization
+->Selenium IDE support for chrome is available
+->Taking screenshot at specific Web element level, Section level and Page level is possible
+->Support for relative locators
+->Selenium Grid: Hub and Node are smooth to setup and handle. Once Selenium server is started the grid will act as a hub and node.
+  
+3. WebDriver.findElement vs WebElement.findElement
+
+4. Difference between Page object model and Page factory
+->Page factory we use @FindBy and PageFactory.initElements() method to initialize all the elements of the class.
+->By class will be used in POM
+->Both use same concepts to store locators but the way we define to store is different [@FindBY and By]
+
+5. Locators supported by Selenium
+->id,name,class,cssSelector,xpath,tagName,linkText,partialLinkText
+
+6. How to overcome Stale element exception
+->Identify and kept it, but when we try to use it it will not be part of DOM then we see SEE.
+->Solution:
+   Wait for 500ms and Re identify 
+   Refresh the page 
+   Identify wile using 
+   Implement Try[Perform action on identified element] Catch block[Re identify and perform action]
+
+7. Difference between xpath and css selector
+->Css is faster than Xpath
+->Xpath support text but Css will not
+->Xpath can move in both forward and backward direction but Css cant.
+
+8. Css Selector using nth element
+->Css Selector:nth-child(index alue);
+ 
+9. How to handle Alerts
+->Use Explicit wait before switching
+->If no alert found then Selenium will throw NoAlrtPresentException
+Alert alert=driver.switchTo().alert();
+alert.accept()
+alert.dismiss()
+alert.sendkeys()
+alert.getText()
+
+10. Different Exceptions
+->NoSuchElementException
+If we try to identify some element and its not available
+
+->NoSuchFrameException
+If we try to swicth to frame and it not exist
+
+->NoAlertPresentException
+If we try to swicth to alert and it not exist
+
+->ElementCLickInterceptedxception
+If we try to click on element and not possile 
+Ex: Click o dropdown option without opening it
+
+->StaleEementException
+->TimeOutException: Notable to perform sme conditio for given wait 
+->InvlidSelectorException: Wrong sysntax of Locator
+->SessionNotCreated: Driver session not initaited
+
+11. What is a Framework
+->Process or an Approach or best practises used to create our Test scripts for
+  Modularity
+  Maintainability
+  Reusability
+
+Types:
+Built In : 
+->Test Ng, Junit, Cucumber, ...
+
+Customized: 
+->Built In + Additional API
+->Data driver, Keyword driven, Hybrid framework
+
+12. Run test in Headless mode
+->CromeOptions options=new ChromeOtions();
+options.addArguements("--headless");
+WebDriver driver=new ChromeDiver();
+
+13.How to handle window based alert or pop up
+->Selenium supports only Web application and does not provide a way to automate Wb based application
+->Use Robot Class[Java based] to simulate the keyboard and mouse actions.
+->Use Auto IT
+
+14. What are Listeners in Selenium
+->ITestListener: Interface which observes the test execution 
+->It has abstract methods through which e can use it i our framework to perform post actions like reporting and attaching screenshot to report.
+onStart/onStart/onTestFailure/onTestSkipped/onFinish
+
+Framework: Reporting and Sreenshot attaching
+
+15.StringBufer and StringBuilder
+->Bot are used to store data of type String
+->String buffer is Synchronized, Thread safe and not Support multi threading. No two thread can call the methods simultaneously. 
+->All methods in Sting buffer class are synchronized methods.
+
+16.Advantages of Selenium in Automation world.
+->Open source, Big community support, Multiple platform, browsers and languages
+
+17. Hard and SoftAssert
+->Both used to put the check point iside the @Test methods
+->HA: If a checkpoint fails then all the below statements will not be executed and that specific test will be failed
+SA: can add multiple checkpoints and execute all checkpoints.
+
+18. Static methods and variables
+->Class specific
+->Any thing to be shared across class then make it static
+->Loaded once in meta space while loading specific class byte code.
+->Can invoke directly using class name no need to create object for it.
+
+Framework: Utility Methods, ExtentManager class method.
+
+19. Usage of this and super keyword
+
+this: To refer current class members
+super: To refer parent class members
+
+Framework:
+
+->In BaseTest, In @BM we initialize the driver and create object for Landing page of POC by sending driver object reference.
+
+public class BaseTest {
+
+	public WebDriver driver = null;
+
+	public WebDriver initializeDriver() throws IOException {
+
+		switch (browser) {
+		case "chrome":
+			driver = new ChromeDriver();
+			break;
+		}
+
+		driver.manage().window().maximize();
+		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+
+		return driver;
+
+	}
+
+	@BeforeMethod(alwaysRun = true)
+	public void launchApplication() throws IOException {
+		driver = initializeDriver();
+		landingPage = new LandingPage(driver);
+		landingPage.goTo();
+	}
+
+}
+
+
+->In Landing page POC, inside constructor we use super(driver) and calls parent class of the POC which is Utilities class
+
+public class LandingPage extends Utilities{
+
+	public WebDriver driver;
+
+	public LandingPage(WebDriver driver) {
+		super(driver);
+		this.driver = driver;
+		PageFactory.initElements(driver, this); // Initialize current class driver object
+	}
+
+}
+
+->Inside Utilities class there is local Web driver object reference 
+->This gets life inside the constructor of Utilities class
+
+public class Utilities {
+	public WebDriver driver;
+	public WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+		
+	public Utilities(WebDriver driver) {
+		this.driver=driver;
+	}
+	
+	public void waitForAnElementToAppear(WebElement element) {
+		wait.until(ExpectedConditions.visibilityOf(element));
+	}
+	
+}
+
+20.Array vs Array List
+->Arrays is a DS or object used to store group of similar homogenous data and not growable in nature.
+->Array list is a Collection or an Class which implements List interface used to store both Homogeneous and Heterogeneous type of data and growable in nature.
+ 
+21. Difference between Interface and Abstract class
+
+22. HashMap and Hashtable
+->Both re used to store data as key value pair.
+->HashTable is synchronized/Thread safe
+->HM: One null key and multiple null vales
+->HT: No null key or value
+
+22. Diffeence between final, finally and  
+finalze()
+
+23. When to use Selenium Grid
+->Used to run scripts on multiple browser and OS concurrently.
+->To run script on distributed test environment
+
+24. How many objects will be created in following cases
+
+String s1="Welcome";
+String s2="Welcome";
+String s3="Welcome";
+
+Only one object will be created since all those are stored in SCP which not allows duplicates.
+All 3 ref var points to same object.
+
+**********************************************************************************************************************************************************
+
+
+
+
+
+
 P1: To count occurrence of each character in a string
 =====================================================
 public class LettersInname {
